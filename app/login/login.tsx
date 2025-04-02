@@ -1,10 +1,13 @@
 "use server";
 
-export async function login(prevState: any, formData: FormData) {
+export async function login(
+  prevState: { error: string; token: string },
+  formData: FormData
+) {
   const username = formData.get("username") as string;
   const password = formData.get("password") as string;
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/test/login`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, password }),
@@ -12,9 +15,9 @@ export async function login(prevState: any, formData: FormData) {
 
   const data = await res.json();
 
-  if (!res.statusText) {
-    return { error: data.error || "Login failed" }; // Use the backend error message if available
+  if (!res.ok) {
+    return { ...prevState, error: data.error || "Login failed", token: "" };
   }
 
-  return { error: "Login successful" }; // Ensure it returns an object matching initialState
+  return { ...prevState, error: "", token: data.token };
 }
