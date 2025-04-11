@@ -7,11 +7,16 @@ import { useState } from "react";
 
 const Header = () => {
   const [isLogin, setIsLogin] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    const user = localStorage.getItem("user");
-    if (user != null) {
+    const jwt = localStorage.getItem("jwt");
+    if (jwt != null) {
       setIsLogin(true);
+      const userRole = localStorage.getItem("userRole");
+      if (userRole == "ADMIN") {
+        setIsAdmin(true);
+      }
     }
   }, []);
 
@@ -33,6 +38,20 @@ const Header = () => {
 
         <div className="flex-none pr-2">
           <ul className="menu menu-horizontal px-1">
+            {isAdmin && (
+              <>
+                <li className="px-5">
+                  <Link href="/usermanagement" className="text-base">
+                    Users
+                  </Link>
+                </li>
+                <li className="px-5">
+                  <Link href="/module" className="text-base">
+                    Module
+                  </Link>
+                </li>
+              </>
+            )}
             <li className="px-5">
               <Link href="/procedure" className="text-base">
                 Procedures

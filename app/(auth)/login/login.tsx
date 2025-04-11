@@ -1,7 +1,9 @@
 "use server";
 
+import { cookies } from "next/headers";
+
 export async function login(
-  prevState: { error: string; token: string },
+  prevState: { error: string; result: string },
   formData: FormData
 ) {
   const username = formData.get("username") as string;
@@ -16,8 +18,17 @@ export async function login(
   const data = await res.json();
 
   if (!res.ok) {
-    return { ...prevState, error: data.error || "Login failed", token: "" };
+    return { ...prevState, error: data.error || "Login failed", result: "" };
   }
 
-  return { ...prevState, error: "", token: data.token };
+  const cookieStore = await cookies();
+  cookieStore.set("token", data.token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: 60 * 60, // 1 hour
+    sameSite: "lax",
+  });
+
+  return { ...prevState, error: "", result: data };
 }

@@ -36,7 +36,8 @@ const HomePageContent = () => {
         <div className="card rounded-none lg:card-side bg-base-100 shadow-md my-5 lg:h-[650px]">
           <figure className="lg:w-1/2 h-full">
             <Image
-              src="/homepage/awan-bangunan-FC_1.png"
+              // src="/homepage/awan-bangunan-FC_1.png"
+              src="/homepage/cardpic_FC.png"
               width={950}
               height={650}
               alt="FC picture"
