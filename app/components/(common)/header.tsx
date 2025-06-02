@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { logoutCookie } from "../../(auth)/logout";
 
 const Header = () => {
   const [isLogin, setIsLogin] = useState(false);
@@ -21,8 +22,18 @@ const Header = () => {
   }, []);
 
   function logoutAction() {
+    console.log("going to clear cookie");
+
     localStorage.removeItem("jwt");
-    localStorage.removeItem("user");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("username");
+    localStorage.removeItem("userRole");
+
+    logoutCookie();
+
+    console.log("token" + localStorage.getItem("jwt"));
+    console.log("role" + localStorage.getItem("userRole"));
+
     setIsLogin(false);
     window.location.href = "/";
   }
@@ -30,14 +41,14 @@ const Header = () => {
   return (
     <>
       <div className="navbar bg-base-100 shadow-sm">
-        <div className="flex-1 pl-7 p-3">
+        <div className="pl-7 p-3 w-[230px]">
           <Link href="/">
             <Image src="/logo_fc.png" width={230} height={53} alt="FC Logo" />
           </Link>
         </div>
 
-        <div className="flex-none pr-2">
-          <ul className="menu menu-horizontal px-1">
+        <div className=" flex-1 pr-2">
+          <ul className="menu menu-horizontal px-1 flex justify-end items-center w-full">
             {isAdmin && (
               <>
                 <li className="px-5">
@@ -58,11 +69,13 @@ const Header = () => {
               </Link>
             </li>
             <li className="px-5">
-              <a className="text-base">Forms</a>
+              <Link href="/form" className="text-base">
+                Forms
+              </Link>
             </li>
-            <li className="px-5">
+            {/* <li className="px-5">
               <a className="text-base">Inquiries</a>
-            </li>
+            </li> */}
             <li className="px-5">
               {!isLogin ? (
                 <Link href="/login" className="text-base">

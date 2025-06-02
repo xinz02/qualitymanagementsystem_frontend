@@ -1,0 +1,38 @@
+body {
+  background: #eee;
+  margin: 0;
+  padding: 20px;
+}
+
+.document-container {
+  width: 210mm;
+  margin: auto;
+}
+
+.page {
+  width: 210mm;
+  min-height: 297mm;
+  padding: 20mm;
+  background: white;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  margin-bottom: 20px;
+  page-break-after: always;
+}
+
+.section {
+  margin-bottom: 16px;
+  break-inside: avoid;
+}
+
+@media print {
+  body {
+    background: none;
+    padding: 0;
+  }
+
+  .page {
+    margin: 0;
+    box-shadow: none;
+    page-break-after: always;
+  }
+}

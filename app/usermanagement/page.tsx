@@ -30,10 +30,11 @@ const UserManagementPage = () => {
 
       console.log("Fetched");
 
-      const data: User[] = await res.json();
+      const data = await res.json();
+      const user: User[] = data.data;
 
       console.log(data);
-      setUsers(data);
+      setUsers(user);
     } catch (err) {
       console.log("Error occurs. Please try again later");
     }

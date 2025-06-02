@@ -1,77 +1,83 @@
 // middleware.js (or middleware.ts for TypeScript)
-import { NextResponse } from 'next/server'
-import { NextRequest } from 'next/server'
+import { NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
 // List of admin paths (can also use regex for more complex matching)
 const adminPaths = [
-    '/usermanagement',
-    // '/usermanagement',
-  '/admin',
-  '/admin/(.*)', // All subroutes under /admin
-  '/upload',
-  '/edit',
-  '/delete'
-]
+  "/usermanagement",
+  // "/module/(.*)",
+  "/admin",
+  "/admin/(.*)", // All subroutes under /admin
+  "/upload",
+  "/edit",
+  "/delete",
+];
 
 // List of protected paths (both admin and regular users need to be logged in)
-const protectedPaths = [
-  ...adminPaths,
-  '/download',
-  '/profile'
-]
+const protectedPaths = [...adminPaths, "/download", "/profile"];
 
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
-  const token = request.cookies.get('token')?.value
+  const { pathname } = request.nextUrl;
+  const token = request.cookies.get("token")?.value;
 
   // 1. Check if the path is protected
-  const isProtectedPath = protectedPaths.some(path => 
-    pathname.startsWith(path.replace('/(.*)', ''))
-  )
+  const isProtectedPath = protectedPaths.some((path) =>
+    pathname.startsWith(path.replace("/(.*)", ""))
+  );
 
   // 2. Check if the path is admin-only
-  const isAdminPath = adminPaths.some(path =>
-    pathname.startsWith(path.replace('/(.*)', ''))
-  )
+  const isAdminPath = adminPaths.some((path) =>
+    pathname.startsWith(path.replace("/(.*)", ""))
+  );
 
   // 3. If not a protected path, continue
   if (!isProtectedPath) {
-    return NextResponse.next()
+    return NextResponse.next();
   }
 
   // 4. If protected path but no token, redirect to login
   if (!token) {
-    const loginUrl = new URL('/login', request.url)
-    loginUrl.searchParams.set('from', pathname)
-    return NextResponse.redirect(loginUrl)
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("from", pathname);
+    return NextResponse.redirect(loginUrl);
   }
 
   try {
     // 5. Verify JWT (in middleware we can only do basic checks)
     const payload = JSON.parse(
-      Buffer.from(token.split('.')[1], 'base64').toString()
-    )
+      Buffer.from(token.split(".")[1], "base64").toString()
+    );
 
-    // 6. If admin path but user is not admin, redirect to unauthorized
-    if (isAdminPath && payload.role !== 'ADMIN') {
-      return NextResponse.redirect(new URL('/unauthorized', request.url))
+    // console.log(payload.role);
+
+    const isNotAdmin = (payload.role !== "ADMIN" && payload.role !== "SPK_MANAGER") || payload.role == null;
+
+    // console.log(isNotAdmin);
+
+    if (isAdminPath && isNotAdmin) {
+      return NextResponse.redirect(new URL("/unauthorized", request.url));
     }
 
+    // // 6. If admin path but user is not admin, redirect to unauthorized
+    // if (isAdminPath && payload.role !== 'ADMIN' || payload.role == null) {
+    //   return NextResponse.redirect(new URL('/unauthorized', request.url))
+    // }
+
     // 7. Add user data to headers for server components/pages to use
-    const headers = new Headers(request.headers)
-    headers.set('x-user-id', payload.id)
-    headers.set('x-user-role', payload.role)
+    const headers = new Headers(request.headers);
+    headers.set("x-user-id", payload.id);
+    headers.set("x-user-role", payload.role);
 
     return NextResponse.next({
       request: {
-        headers
-      }
-    })
+        headers,
+      },
+    });
   } catch (error) {
     // 8. If token is invalid, clear cookie and redirect to login
-    const response = NextResponse.redirect(new URL('/login', request.url))
-    response.cookies.delete('token')
-    return response
+    const response = NextResponse.redirect(new URL("/login", request.url));
+    response.cookies.delete("token");
+    return response;
   }
 }
 
@@ -86,9 +92,9 @@ export const config = {
      * - favicon.ico (favicon file)
      * - public folder
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|public).*)',
+    "/((?!api|_next/static|_next/image|favicon.ico|public).*)",
   ],
-}
+};
 
 // import { NextResponse } from 'next/server';
 
