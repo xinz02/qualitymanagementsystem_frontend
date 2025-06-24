@@ -1,10 +1,13 @@
 import React from "react";
 import ProcedureForm from "../page";
+import { UserProvider } from "@/app/components/(context)/usercontext";
 
 const AddProcedurePage = () => {
   return (
     <div>
-      <ProcedureForm />
+      <UserProvider>
+        <ProcedureForm />
+      </UserProvider>
     </div>
   );
 };

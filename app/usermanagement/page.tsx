@@ -309,11 +309,12 @@ const UserManagementPage = () => {
                     className="select input rounded-lg pr-10 w-full"
                   >
                     <option value="ADMIN">Admin</option>
+                    <option value="SPK_MANAGER">SPK Manager</option>
                     <option value="ACADEMIC_STAFF">Academic Staff</option>
                     <option value="NON_ACADEMIC_STAFF">
                       Non-Academic Staff
                     </option>
-                    <option value="SPK_MANAGER">SPK Manager</option>
+                    <option value="APPROVER">Approver</option>
                   </select>
                 </fieldset>
                 <div className="modal-action">
@@ -413,10 +414,12 @@ const UserManagementPage = () => {
                   <option disabled value="Select a role">
                     Select a role
                   </option>
+
                   <option value="ADMIN">Admin</option>
+                  <option value="SPK_MANAGER">SPK Manager</option>
                   <option value="ACADEMIC_STAFF">Academic Staff</option>
                   <option value="NON_ACADEMIC_STAFF">Non-Academic Staff</option>
-                  <option value="SPK_MANAGER">SPK Manager</option>
+                  <option value="APPROVER">Approver</option>
                 </select>
                 {errors.role && (
                   <p className="text-sm text-red-500">{errors.role.message}</p>

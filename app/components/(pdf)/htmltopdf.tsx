@@ -104,6 +104,7 @@ const styles = StyleSheet.create({
     // borderBottomWidth: 0,
     // borderColor: "#000",
     marginBottom: 10,
+    marginTop: 5,
   },
   tableRow: {
     flexDirection: "row",
@@ -203,6 +204,64 @@ const parseBorderShorthand = (value: string) => {
 const HTMLToPDF = ({ html }: { html: string }) => {
   const root = parseDocument(html);
 
+  // const renderListItems = (
+  //   nodes: Node[],
+  //   listType: "ul" | "ol" = "ul",
+  //   level = 0
+  // ): React.ReactNode[] => {
+  //   return nodes
+  //     .filter((node) => node.type === "tag" && (node as Element).name === "li")
+  //     .map((liNode, liIndex) => {
+  //       const liElement = liNode as Element;
+  //       const children = renderNodes(liElement.children);
+
+  //       return (
+  //         <View key={`${level}-${liIndex}`}>
+  //           <View style={styles.listItem}>
+  //             <Text
+  //               style={[
+  //                 styles.bullet,
+  //                 {
+  //                   fontSize: 12,
+  //                   fontFamily: "Arial",
+  //                   paddingTop: listType === "ul" ? 7 : 4,
+  //                   paddingRight: listType === "ul" ? 4 : 3,
+  //                 },
+  //               ]}
+  //             >
+  //               {listType === "ul" ? "•" : `${liIndex + 1}.`}
+  //             </Text>
+  //             <Text style={{ fontSize: 12, fontFamily: "Arial" }}>
+  //               {children.filter((child) => {
+  //                 if (React.isValidElement(child) && child.type === View) {
+  //                   return false;
+  //                 }
+  //                 return true;
+  //               })}
+  //             </Text>
+  //           </View>
+
+  //           {liElement.children.map((child, i) => {
+  //             if (child.type === "tag" && (child as Element).name === "ul") {
+  //               return (
+  //                 <View key={`nested-ul-${i}`} style={styles.nestedList}>
+  //                   {renderListItems(child.children, "ul", level + 1)}
+  //                 </View>
+  //               );
+  //             }
+  //             if (child.type === "tag" && (child as Element).name === "ol") {
+  //               return (
+  //                 <View key={`nested-ol-${i}`} style={styles.nestedList}>
+  //                   {renderListItems(child.children, "ol", level + 1)}
+  //                 </View>
+  //               );
+  //             }
+  //             return null;
+  //           })}
+  //         </View>
+  //       );
+  //     });
+  // };
   const renderListItems = (
     nodes: Node[],
     listType: "ul" | "ol" = "ul",
@@ -215,7 +274,7 @@ const HTMLToPDF = ({ html }: { html: string }) => {
         const children = renderNodes(liElement.children);
 
         return (
-          <View key={`${level}-${liIndex}`}>
+          <View key={`li-${level}-${liIndex}`}>
             <View style={styles.listItem}>
               <Text
                 style={[
@@ -223,7 +282,7 @@ const HTMLToPDF = ({ html }: { html: string }) => {
                   {
                     fontSize: 12,
                     fontFamily: "Arial",
-                    paddingTop: listType === "ul" ? 7 : 4,
+                    paddingTop: listType === "ul" ? 4 : 4,
                     paddingRight: listType === "ul" ? 4 : 3,
                   },
                 ]}
@@ -243,14 +302,20 @@ const HTMLToPDF = ({ html }: { html: string }) => {
             {liElement.children.map((child, i) => {
               if (child.type === "tag" && (child as Element).name === "ul") {
                 return (
-                  <View key={`nested-ul-${i}`} style={styles.nestedList}>
+                  <View
+                    key={`nested-ul-${level}-${i}`}
+                    style={styles.nestedList}
+                  >
                     {renderListItems(child.children, "ul", level + 1)}
                   </View>
                 );
               }
               if (child.type === "tag" && (child as Element).name === "ol") {
                 return (
-                  <View key={`nested-ol-${i}`} style={styles.nestedList}>
+                  <View
+                    key={`nested-ol-${level}-${i}`}
+                    style={styles.nestedList}
+                  >
                     {renderListItems(child.children, "ol", level + 1)}
                   </View>
                 );
@@ -404,10 +469,10 @@ const HTMLToPDF = ({ html }: { html: string }) => {
 
           case "tr":
             return (
-              <View>
+              <View key={i}>
                 <TR
-                  // wrap={false}
-                  key={i}
+                  wrap={false}
+                  // key={i}
                   style={{
                     flexDirection: "row",
                     flexWrap: "nowrap",
@@ -439,8 +504,9 @@ const HTMLToPDF = ({ html }: { html: string }) => {
 
             const cellStyles = {
               ...styles.tableCell,
-              borderWidth: isTransparent ? 0.00001 : 1,
-              borderColor: isTransparent ? "#ffffff00" : "#000",
+              border: isTransparent ? "1pt solid #fff" : "1pt solid #000",
+              // borderWidth: isTransparent ? 0.00001 : 1,
+              // borderColor: isTransparent ? "transparent" : "#000",
               flex: colWidth ? `0 0 ${colWidth}pt` : 1,
               width: colWidth ? `${colWidth}pt` : "auto",
             };
@@ -517,7 +583,11 @@ const HTMLToPDF = ({ html }: { html: string }) => {
           // }
 
           case "th":
-            return <TH style={styles.tableHeader}>{children}</TH>;
+            return (
+              <TH key={i} style={styles.tableHeader}>
+                {children}
+              </TH>
+            );
           // return <View style={styles.tableHeader}>{children}</View>;
 
           default:

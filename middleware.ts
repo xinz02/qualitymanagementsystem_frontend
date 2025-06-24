@@ -5,7 +5,7 @@ import { NextRequest } from "next/server";
 // List of admin paths (can also use regex for more complex matching)
 const adminPaths = [
   "/usermanagement",
-  // "/module/(.*)",
+  "/module/(.*)",
   "/admin",
   "/admin/(.*)", // All subroutes under /admin
   "/upload",
@@ -14,7 +14,7 @@ const adminPaths = [
 ];
 
 // List of protected paths (both admin and regular users need to be logged in)
-const protectedPaths = [...adminPaths, "/download", "/profile"];
+const protectedPaths = [...adminPaths, "/procedure/view/(.*)", "/profile"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -50,7 +50,9 @@ export function middleware(request: NextRequest) {
 
     // console.log(payload.role);
 
-    const isNotAdmin = (payload.role !== "ADMIN" && payload.role !== "SPK_MANAGER") || payload.role == null;
+    const isNotAdmin =
+      (payload.role !== "ADMIN" && payload.role !== "SPK_MANAGER") ||
+      payload.role == null;
 
     // console.log(isNotAdmin);
 

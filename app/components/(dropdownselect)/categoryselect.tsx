@@ -13,7 +13,12 @@ interface CategorySelectProps {
   disabled?: boolean;
 }
 
-const CategorySelect = ({ options, value, onChange, disabled }: CategorySelectProps) => {
+const CategorySelect = ({
+  options,
+  value,
+  onChange,
+  disabled,
+}: CategorySelectProps) => {
   return (
     <Select
       isClearable
@@ -36,6 +41,11 @@ const CategorySelect = ({ options, value, onChange, disabled }: CategorySelectPr
           borderRadius: "0.5rem",
           width: "250px",
           "&:hover": { borderColor: "#6b7280" },
+        }),
+        menuList: (base) => ({
+          ...base,
+          maxHeight: "150px",
+          overflowY: "auto",
         }),
       }}
     />

@@ -6,3 +6,9 @@ export interface Module {
   viewPrivilege: string[];
   categories: Category[];
 }
+
+export interface ModuleFormData {
+  moduleName: string;
+  viewPrivilege: string[];
+  categoryNames: string[];
+}

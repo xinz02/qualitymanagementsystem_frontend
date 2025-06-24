@@ -4,6 +4,8 @@ export async function resetPassword(
   prevState: { success: string; error: string },
   formData: FormData
 ) {
+  // const router = useRouter();
+
   const password = formData.get("password") as string;
   const confirmedpassword = formData.get("confirmedpassword") as string;
   const token = formData.get("token") as string;
@@ -34,6 +36,9 @@ export async function resetPassword(
       success: "",
     };
   }
+
+  // triggerGlobalToast(data.success, "success");
+  // router.push("/login");
 
   return { ...prevState, error: "", success: data.success };
 }

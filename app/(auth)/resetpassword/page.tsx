@@ -4,9 +4,11 @@ import React, { useActionState } from "react";
 import { useState, useEffect } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { resetPassword } from "./resetpassword";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { triggerGlobalToast } from "@/app/components/(common)/toast/showtoast";
 
 const ResetPasswordPage = () => {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const tokenId = searchParams.get("token") ?? "";
 
@@ -27,8 +29,10 @@ const ResetPasswordPage = () => {
       const timer = setTimeout(() => setShowError(false), 3000); // Hide after 3 seconds
       return () => clearTimeout(timer);
     } else if (state.success) {
-      setShowSuccess(true);
+      // setShowSuccess(true);
       setShowError(false);
+      triggerGlobalToast(state.success, "success");
+      router.push("/login");
     }
   }, [state]);
 

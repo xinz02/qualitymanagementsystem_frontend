@@ -76,7 +76,14 @@ const ProcedureFooter = ({
           <TD style={styles.td2}>:</TD>
           <TD style={styles.td3}>{nomborDokumen}</TD>
           <TD style={styles.td4}></TD>
-          <TD style={styles.td5}>Mukasurat 2/11</TD>
+          <TD style={styles.td5}>
+            {/* Mukasurat 2/11 */}
+            <Text
+              render={({ pageNumber, totalPages }) =>
+                `Mukasurat ${pageNumber - 1}/${totalPages - 1}`
+              }
+            />
+          </TD>
         </TR>
         <TR>
           <TD style={styles.td1}>Pindaan</TD>

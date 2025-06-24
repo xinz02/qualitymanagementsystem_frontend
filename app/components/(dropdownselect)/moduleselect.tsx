@@ -18,7 +18,9 @@ const ModuleSelect = ({ value, onChange }: ModuleSelectProps) => {
 
   const loadModuleOptions = async (inputValue: string) => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/module/getAllModule`);
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/module/getAllModule`
+      );
 
       const result = await res.json();
       const data: Module[] = result.data ?? [];
@@ -77,6 +79,11 @@ const ModuleSelect = ({ value, onChange }: ModuleSelectProps) => {
           borderRadius: "0.5rem",
           width: "250px",
           "&:hover": { borderColor: "#6b7280" },
+        }),
+        menuList: (base) => ({
+          ...base,
+          maxHeight: "150px",
+          overflowY: "auto",
         }),
       }}
     />

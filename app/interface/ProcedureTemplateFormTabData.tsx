@@ -5,6 +5,7 @@ export interface ProcedureTemplateFormTabData {
   setFormData: React.Dispatch<
     React.SetStateAction<ProcedureTemplateFormData | null>
   >;
+
   fields?: {
     label: string;
     key: keyof ProcedureTemplateFormData;

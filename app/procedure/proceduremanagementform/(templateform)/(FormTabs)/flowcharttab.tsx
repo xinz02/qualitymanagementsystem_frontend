@@ -9,47 +9,32 @@ const FlowChartTab = ({
   return (
     <div className=" bg-base-100 border-base-300 p-6">
       <FlowCharts
+        flowChartId={formData.cartaFungsi.flowChartId}
         mainFlowChart={formData.cartaFungsi.mainFlowChart}
         subFlowCharts={formData.cartaFungsi.subFlowCharts}
-        onMainFlowChartChange={
-          (newMainChart) =>
-            setFormData((prev) => {
-              if (!prev) return null;
-              return {
-                ...prev,
-                cartaFungsi: {
-                  ...prev.cartaFungsi,
-                  mainFlowChart: newMainChart,
-                },
-              };
-            })
-          //   setFormData({
-          //     ...formData,
-          //     cartaFungsi: {
-          //       ...formData.cartaFungsi,
-          //       mainFlowChart: newMainChart,
-          //     },
-          //   })
+        onMainFlowChartChange={(newMainChart) =>
+          setFormData((prev) => {
+            if (!prev) return null;
+            return {
+              ...prev,
+              cartaFungsi: {
+                ...prev.cartaFungsi,
+                mainFlowChart: newMainChart,
+              },
+            };
+          })
         }
-        onSubFlowChartsChange={
-          (newSubCharts) =>
-            setFormData((prev) => {
-              if (!prev) return null;
-              return {
-                ...prev,
-                cartaFungsi: {
-                  ...prev.cartaFungsi,
-                  subFlowCharts: newSubCharts,
-                },
-              };
-            })
-          //   setFormData({
-          //     ...formData,
-          //     cartaFungsi: {
-          //       ...formData.cartaFungsi,
-          //       subFlowCharts: newSubCharts,
-          //     },
-          //   })
+        onSubFlowChartsChange={(newSubCharts) =>
+          setFormData((prev) => {
+            if (!prev) return null;
+            return {
+              ...prev,
+              cartaFungsi: {
+                ...prev.cartaFungsi,
+                subFlowCharts: newSubCharts,
+              },
+            };
+          })
         }
       />
     </div>

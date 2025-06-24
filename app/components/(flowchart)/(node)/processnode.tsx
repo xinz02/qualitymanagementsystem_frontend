@@ -196,23 +196,18 @@ import CustomNodeBase from "./customnode";
 import { NodeProps } from "@xyflow/react";
 
 export function ProcessNode(props: NodeProps) {
+
   return (
     <>
-      {/* <NodeResizer minWidth={100} minHeight={30} /> */}
-      {/* <NodeResizer
-        color="#ff0071"
-        isVisible={props.selected}
-        minWidth={100}
-        minHeight={30}
-      /> */}
-      <CustomNodeBase
-        id={props.id}
-        data={props.data}
-        hasLabel={false}
-        selected={props.selected}
-        width={props.width}
-        height={props.height}
-      />
+        <CustomNodeBase
+          id={props.id}
+          data={props.data}
+          hasLabel={false}
+          selected={props.selected}
+          width={props.width}
+          height={props.height}
+        />
+     
     </>
   );
 }

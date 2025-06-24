@@ -1,7 +1,8 @@
 import React from "react";
 import { View, Image, Text, StyleSheet } from "@react-pdf/renderer";
 import { Table, TH, TR, TD } from "@ag-media/react-pdf-table";
-import { PindaanDokumen } from "@/app/interface/ProcedureTemplateFormData";
+import { PindaanDokumenSimplified } from "@/app/interface/ProcedureTemplateFormData";
+import { User } from "@/app/interface/User";
 
 const styles = StyleSheet.create({
   pindaanHeader: {
@@ -28,7 +29,7 @@ const styles = StyleSheet.create({
 type CoverpageProps = {
   namaDokumen: string;
   nomborDokumen: string;
-  pindaanDokumen: PindaanDokumen[];
+  pindaanDokumen: PindaanDokumenSimplified[];
 };
 
 const CoverPagePDF = ({
@@ -36,7 +37,7 @@ const CoverPagePDF = ({
   nomborDokumen,
   pindaanDokumen,
 }: CoverpageProps) => {
-  const rowsPerPage = 11;
+  const rowsPerPage = 10;
   const pages = [];
   for (let i = 0; i < pindaanDokumen.length; i += rowsPerPage) {
     pages.push(pindaanDokumen.slice(i, i + rowsPerPage));
@@ -219,29 +220,31 @@ const CoverPagePDF = ({
           marginTop: 25,
         }}
       >
-        <Text style={[styles.tableCell, { flex: 1 }]}>Pindaan</Text>
+        <Text style={[styles.tableCell, { flex: 1 }]}>Versi</Text>
         <Text style={[styles.tableCell, { flex: 2 }]}>Tarikh</Text>
         <Text style={[styles.tableCell, { flex: 3 }]}>Butiran</Text>
+        <Text style={[styles.tableCell, { flex: 4 }]}>Deskripsi Perubahan</Text>
         <Text style={[styles.tableCell, { flex: 2 }]}>Disediakan</Text>
         <Text style={[styles.tableCell, { flex: 2 }]}>Diluluskan</Text>
       </View>
 
       {/* Table Rows */}
-      {(pindaanDokumen.length < 11 ? [...Array(11)] : pindaanDokumen).map(
+      {(pindaanDokumen.length < 10 ? [...Array(10)] : pindaanDokumen).map(
         (item, index) => {
           const rowData =
-            pindaanDokumen.length < 11
+            pindaanDokumen.length < 10
               ? pindaanDokumen[index] || {
-                  pindaan: index,
+                  versi: index + 1,
                   tarikh: "",
                   butiran: "",
-                  disediakan: "",
+                  deskripsiPerubahan: "",
+                  disediakan: [],
                   diluluskan: "",
                 }
               : item;
 
           const lastIndex =
-            pindaanDokumen.length < 11 ? 10 : pindaanDokumen.length - 1;
+            pindaanDokumen.length < 10 ? 10 : pindaanDokumen.length;
 
           return (
             <View
@@ -261,7 +264,7 @@ const CoverPagePDF = ({
               <Text
                 style={[styles.tableCell, { flex: 1, textAlign: "center" }]}
               >
-                {rowData.pindaan}
+                {rowData.versi}
               </Text>
               <Text style={[styles.tableCell, { flex: 2 }]}>
                 {rowData.tarikh}
@@ -269,11 +272,29 @@ const CoverPagePDF = ({
               <Text style={[styles.tableCell, { flex: 3 }]}>
                 {rowData.butiran}
               </Text>
-              <Text style={[styles.tableCell, { flex: 2 }]}>
+              <Text style={[styles.tableCell, { flex: 4 }]}>
+                {rowData.deskripsiPerubahan}
+              </Text>
+              {/* <Text style={[styles.tableCell, { flex: 2 }]}>
                 {rowData.disediakan}
+                {rowData.disediakan
+                              ? rowData.disediakan
+                                  .map((user: User) => user.name)
+                                  .join(", ")
+                              : "N/A"}
               </Text>
               <Text style={[styles.tableCell, { flex: 2 }]}>
-                {rowData.diluluskan}
+                {rowData.diluluskan.name}
+              </Text> */}
+              <Text style={[styles.tableCell, { flex: 2 }]}>
+                {rowData.disediakan && Array.isArray(rowData.disediakan)
+                  ? rowData.disediakan.map((user: User) => user.name).join(", ")
+                  : ""}
+              </Text>
+              <Text style={[styles.tableCell, { flex: 2 }]}>
+                {rowData.diluluskan && typeof rowData.diluluskan === "object"
+                  ? rowData.diluluskan.name
+                  : ""}
               </Text>
             </View>
           );

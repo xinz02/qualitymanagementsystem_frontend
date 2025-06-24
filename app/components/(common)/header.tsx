@@ -15,7 +15,7 @@ const Header = () => {
     if (jwt != null) {
       setIsLogin(true);
       const userRole = localStorage.getItem("userRole");
-      if (userRole == "ADMIN") {
+      if (userRole == "ADMIN" || userRole == "SPK_MANAGER") {
         setIsAdmin(true);
       }
     }
@@ -69,7 +69,7 @@ const Header = () => {
               </Link>
             </li>
             <li className="px-5">
-              <Link href="/form" className="text-base">
+              <Link href="/forms" className="text-base">
                 Forms
               </Link>
             </li>

@@ -3,61 +3,64 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { SelectOption } from "@/app/interface/SelectOption";
-import dynamic from "next/dynamic";
-import { User } from "@/app/interface/User";
-import { PlusIcon, UploadIcon, CheckIcon, File, X } from "lucide-react";
-import ModuleSelect from "@/app/components/(dropdownselect)/moduleselect";
-import CategorySelect from "@/app/components/(dropdownselect)/categoryselect";
-import StepForm from "./(templateform)/TemplateForm";
+import { File, X, CornerDownLeft } from "lucide-react";
 import { ProcedureTemplateFormData } from "@/app/interface/ProcedureTemplateFormData";
-import { set, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { ProcedureFormData } from "@/app/interface/Procedure";
 import { toast } from "react-toastify";
+import {
+  bytesToMB,
+  handleDeleteProcedure,
+  useProcedureFormFields,
+} from "../proceduremanagement";
+import UserAsyncSelect from "@/app/components/(dropdownselect)/userselect";
+import { useUserContext } from "@/app/components/(context)/usercontext";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-
-// Lazy load Select and AsyncSelect only on client
-const AsyncSelect = dynamic(() => import("react-select/async"), { ssr: false });
+import { triggerGlobalToast } from "@/app/components/(common)/toast/showtoast";
+import TemplateForm from "./(templateform)/TemplateForm";
+import ProcedureInfoForm from "./procedureinfoform";
 
 interface ProcedureFormProps {
-  procedureID?: string;
+  procedureID: string;
+  version: string;
 }
 
-const ProcedureForm = ({ procedureID }: ProcedureFormProps) => {
+const ProcedureForm = ({ procedureID, version }: ProcedureFormProps) => {
   const [role, setRole] = useState("STUDENT");
   const [token, setToken] = useState("");
-  const [categoryOptions, setCategoryOptions] = useState<SelectOption[]>([]);
-  const [selectedModule, setSelectedModule] = useState<SelectOption | null>(
-    null
-  );
-  const [selectedCategory, setSelectedCategory] = useState<SelectOption | null>(
-    null
-  );
-  const [selectedUsers, setSelectedUsers] = useState<SelectOption[]>([]);
+  const [userId, setUserId] = useState("");
   const [selectedApprover, setSelectedApprover] = useState<SelectOption | null>(
     null
   );
-
-  const [allUsers, setAllUsers] = useState<User[]>([]);
-  const [selectedProcedureMode, setSelectedProcedureMode] = useState<
-    "create" | "upload" | null
-  >(null);
-
-  const [stepFormData, setStepFormData] =
+  const [approveStatus, setApproveStatus] = useState<string>("PENDING");
+  const [templateFormData, setTemplateFormData] =
     useState<ProcedureTemplateFormData | null>(null);
 
-  const handleSelectProcedureMode = (mode: "create" | "upload") => {
-    console.log("Clicked: " + mode);
-    setSelectedProcedureMode(mode);
-  };
+  const router = useRouter();
 
   const {
     register,
     handleSubmit,
-    reset,
+    getValues,
     setValue,
     watch,
     formState: { errors },
   } = useForm<ProcedureFormData>();
+
+  const {
+    selectedModule,
+    selectedCategory,
+    categoryOptions,
+    selectedUsers,
+    handleModuleChange,
+    handleCategoryChange,
+    handleSelectUser,
+    setSelectedModule,
+    setSelectedCategory,
+    setCategoryOptions,
+    setSelectedUsers,
+  } = useProcedureFormFields(setValue);
 
   const fileName = watch("fileName");
   const fileType = watch("fileType");
@@ -68,76 +71,48 @@ const ProcedureForm = ({ procedureID }: ProcedureFormProps) => {
     if (typeof window !== "undefined") {
       setRole(localStorage.getItem("userRole") || "STUDENT");
       setToken(localStorage.getItem("jwt") || "");
+      setUserId(localStorage.getItem("userId") || "");
     }
   }, []);
 
   useEffect(() => {
-    if (procedureID) {
-      getProcedureById(procedureID);
-      // const fileName = watch("fileName");
-      //   const fileType = watch("fileType");
-      //   const fileDownloadUrl = watch("fileDownloadUrl");
+    if (procedureID && version) {
+      getProcedureById(procedureID, version);
     }
   }, [procedureID]);
 
-  useEffect(() => {
-    const fetchAllUsers = async () => {
-      try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/users/getAllUsers`
-        );
-        const result = await res.json();
-        const data: User[] = result.data ?? [];
-
-        if (Array.isArray(data)) {
-          setAllUsers(data);
-        } else {
-          setAllUsers([]);
-          console.error("Invalid user data:", data);
-        }
-      } catch (error) {
-        console.error("Failed to load users:", error);
-      }
-    };
-
-    fetchAllUsers();
-
-    const interval = setInterval(fetchAllUsers, 5 * 60 * 1000); // refresh every 5 mins
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const getProcedureById = async (id: string) => {
+  const getProcedureById = async (id: string, version: string) => {
+    const jwtToken = localStorage.getItem("jwt") || "";
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/procedure/getProcedure/${id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/procedure/getProcedure/${id}/${version}`,
         {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${jwtToken}`,
           },
         }
       );
 
-      if (!res.ok) {
-        throw new Error("Failed to fetch procedure");
-      }
-
       const result = await res.json();
       const procedureData = result.data;
+
+      if (!res.ok) {
+        throw new Error(
+          result.message || result.error || "Failed to fetch procedure"
+        );
+      }
+
+      console.log("ProcedureData: ", procedureData);
 
       if (!procedureData) {
         throw new Error("No procedure data found");
       }
 
-      console.log(procedureData.procedureTemplateData.cartaFungsi);
-
-      // Set basic fields
       setValue("procedureNumber", procedureData.procedureNumber);
       setValue("procedureName", procedureData.procedureName);
 
-      // Set module
       if (procedureData.module) {
         const moduleOption = {
           value: procedureData.module.moduleId,
@@ -146,7 +121,6 @@ const ProcedureForm = ({ procedureID }: ProcedureFormProps) => {
         setSelectedModule(moduleOption);
         setValue("moduleId", moduleOption.value);
 
-        // Fetch categories for this module to populate category options
         const categoriesResult = procedureData.module.categories;
         const categoryOptions = categoriesResult.map((cat: any) => ({
           value: cat.categoryId,
@@ -155,7 +129,6 @@ const ProcedureForm = ({ procedureID }: ProcedureFormProps) => {
         setCategoryOptions(categoryOptions);
       }
 
-      // Set category
       if (procedureData.category) {
         const categoryOption = {
           value: procedureData.category.categoryId,
@@ -165,164 +138,159 @@ const ProcedureForm = ({ procedureID }: ProcedureFormProps) => {
         setValue("categoryId", categoryOption.value);
       }
 
-      // Set view privilege
       if (procedureData.viewPrivilege) {
         setValue(`viewPrivilege`, procedureData.viewPrivilege);
       }
 
-      // Set assigned users
-      if (procedureData.assignTo && procedureData.assignTo.length > 0) {
-        const userOptions = procedureData.assignTo.map((user: any) => ({
-          value: user.userId,
-          label: user.username,
-        }));
+      if (
+        procedureData.pindaanDokumen &&
+        procedureData.pindaanDokumen.assignTo &&
+        procedureData.pindaanDokumen.assignTo.length > 0
+      ) {
+        const userOptions = procedureData.pindaanDokumen.assignTo.map(
+          (user: any) => ({
+            value: user.userId,
+            label: user.name,
+          })
+        );
         setSelectedUsers(userOptions);
         setValue(
-          "assignedToIds",
+          "pindaanDokumen.assignedTo",
           userOptions.map((u: any) => u.value)
         );
+        // setValue(
+        //   "pindaanDokumen.assignedTo",
+        //   userOptions.map((u: any) => u.value)
+        // );
       }
 
-      // Set approver
-      if (procedureData.approver) {
-        const approverOption = {
-          value: procedureData.approver.userId,
-          label: procedureData.approver.username,
-        };
-        setSelectedApprover(approverOption);
-        setValue("approverId", approverOption.value);
-      }
+      if (
+        procedureData.pindaanDokumen &&
+        procedureData.pindaanDokumen.procedureTemplateData
+      ) {
+        setValue("pindaanDokumen", procedureData.pindaanDokumen);
 
-      // Set approve status
-      setValue("approveStatus", procedureData.approveStatus);
-
-      // Handle procedure template data
-      if (procedureData.procedureTemplateData) {
-        setStepFormData({
-          namaDokumen: procedureData.procedureTemplateData.namaDokumen,
-          nomborDokumen: procedureData.procedureTemplateData.nomborDokumen,
-          pindaanDokumen: procedureData.procedureTemplateData.pindaanDokumen,
-          cartaFungsi: procedureData.procedureTemplateData.cartaFungsi,
-          tujuan: procedureData.procedureTemplateData.tujuan,
-          objektif: procedureData.procedureTemplateData.objektif,
-          skop: procedureData.procedureTemplateData.skop,
-          terminologi: procedureData.procedureTemplateData.terminologi,
-          singkatan: procedureData.procedureTemplateData.singkatan,
-          rujukan: procedureData.procedureTemplateData.rujukan,
-          prosedur: procedureData.procedureTemplateData.prosedur,
+        setTemplateFormData({
+          namaDokumen:
+            procedureData.pindaanDokumen.procedureTemplateData.namaDokumen,
+          nomborDokumen:
+            procedureData.pindaanDokumen.procedureTemplateData.nomborDokumen,
+          pindaanDokumen: procedureData.pindaanDokumen,
+          // pindaanDokumen.versi: procedureData.pindaanDokumen.versi,
+          cartaFungsi:
+            procedureData.pindaanDokumen.procedureTemplateData.cartaFungsi,
+          tujuan: procedureData.pindaanDokumen.procedureTemplateData.tujuan,
+          objektif: procedureData.pindaanDokumen.procedureTemplateData.objektif,
+          skop: procedureData.pindaanDokumen.procedureTemplateData.skop,
+          terminologi:
+            procedureData.pindaanDokumen.procedureTemplateData.terminologi,
+          singkatan:
+            procedureData.pindaanDokumen.procedureTemplateData.singkatan,
+          rujukan: procedureData.pindaanDokumen.procedureTemplateData.rujukan,
+          prosedur: procedureData.pindaanDokumen.procedureTemplateData.prosedur,
           rekodDanSimpanan:
-            procedureData.procedureTemplateData.rekodDanSimpanan,
-          lampiran: procedureData.procedureTemplateData.lampiran,
+            procedureData.pindaanDokumen.procedureTemplateData.rekodDanSimpanan,
+          lampiran: procedureData.pindaanDokumen.procedureTemplateData.lampiran,
         });
-        setSelectedProcedureMode("create");
-      } else if (
+
+        if (procedureData.pindaanDokumen.approveStatus) {
+          setApproveStatus(procedureData.pindaanDokumen.approveStatus);
+        }
+      }
+      if (
         procedureData.fileName &&
         procedureData.fileType &&
         procedureData.fileDownloadUrl
       ) {
-        setSelectedProcedureMode("upload");
         setValue("fileName", procedureData.fileName);
         setValue("fileType", procedureData.fileType);
         setValue("fileDownloadUrl", procedureData.fileDownloadUrl);
         setValue("fileSize", procedureData.fileSize);
-        // You might want to set the file name here if needed
       }
     } catch (error) {
-      console.error("Failed to load procedure:", error);
-      toast.error("Failed to load procedure data");
+      if (error instanceof Error) {
+        triggerGlobalToast(error.message, "error");
+      } else {
+        triggerGlobalToast("An unknown error occurred", "error");
+      }
     }
   };
 
-  const handleSelectUser = (newValue: unknown) => {
-    const selectedOptions = newValue as SelectOption[];
-    setSelectedUsers(selectedOptions || []);
+  // const handleSelectApprover = (newValue: unknown) => {
+  //   const selectedOption = newValue as SelectOption | null;
+  //   setSelectedApprover(selectedOption);
 
-    if (selectedOptions.length > 0) {
-      const userIds = selectedOptions.map((user) => user.value);
-      setValue("assignedToIds", userIds);
-    }
-  };
-
-  const handleSelectApprover = (newValue: unknown) => {
-    const selectedOption = newValue as SelectOption | null;
-    setSelectedApprover(selectedOption);
-
-    if (selectedOption) {
-      setValue("approverId", selectedOption.value);
-    }
-  };
-
-  const handleModuleChange = (
-    module: SelectOption | null,
-    categories: SelectOption[]
-  ) => {
-    setSelectedModule(module);
-    setCategoryOptions(categories);
-    setSelectedCategory(null); // Reset selected category when module changes
-
-    if (module) {
-      setValue("moduleId", module.value);
-    }
-  };
-
-  const handleCategoryChange = (category: SelectOption | null) => {
-    setSelectedCategory(category);
-
-    if (category) {
-      setValue("categoryId", category.value);
-    }
-  };
-
-  const loadUserOptions = async (inputValue: string) => {
-    const filtered = allUsers.filter(
-      (user) =>
-        user.username.toLowerCase().includes(inputValue.toLowerCase()) &&
-        user.role !== "ADMIN" &&
-        user.role !== "SPK_MANAGER"
-    );
-
-    return filtered.map((user) => ({
-      value: user.userId!,
-      label: user.username,
-    }));
-  };
+  //   if (selectedOption) {
+  //     setValue("approverId", selectedOption.value);
+  //   }
+  // };
 
   const handleProcedureSubmit = async (data: ProcedureFormData) => {
     const completeData = {
       ...data,
-      procedureTemplateData:
-        selectedProcedureMode === "create" ? stepFormData : null,
+      procedureTemplateData: templateFormData,
     };
-    console.log(completeData);
+    console.log("Form Data: ", completeData);
+
+    if (data.procedureFile && data.pindaanDokumen) {
+      triggerGlobalToast(
+        "Only allow either create new procedure or upload file.",
+        "error"
+      );
+      return;
+    }
 
     try {
       const formData = new FormData();
       if (data.procedureFile) {
         formData.append("file", data.procedureFile);
-        console.log("File Uploaded");
-        console.log(data.procedureFile);
-        console.log("formdatafile");
-
-        console.log(formData.get("file"));
-      }
-
-      if (stepFormData) {
+      } else if (templateFormData) {
         const procedureTemplateData = JSON.stringify({
-          namaDokumen: stepFormData.namaDokumen,
-          nomborDokumen: stepFormData.nomborDokumen,
-          pindaanDokumen: stepFormData.pindaanDokumen,
-          cartaFungsi: stepFormData.cartaFungsi,
-          tujuan: stepFormData.tujuan,
-          objektif: stepFormData.objektif,
-          skop: stepFormData.skop,
-          terminologi: stepFormData.terminologi,
-          singkatan: stepFormData.singkatan,
-          rujukan: stepFormData.rujukan,
-          prosedur: stepFormData.prosedur,
-          rekodDanSimpanan: stepFormData.rekodDanSimpanan,
-          lampiran: stepFormData.lampiran,
+          namaDokumen: templateFormData.namaDokumen,
+          nomborDokumen: templateFormData.nomborDokumen,
+          cartaFungsi: templateFormData.cartaFungsi,
+          tujuan: templateFormData.tujuan,
+          objektif: templateFormData.objektif,
+          skop: templateFormData.skop,
+          terminologi: templateFormData.terminologi,
+          singkatan: templateFormData.singkatan,
+          rujukan: templateFormData.rujukan,
+          prosedur: templateFormData.prosedur,
+          rekodDanSimpanan: templateFormData.rekodDanSimpanan,
+          lampiran: templateFormData.lampiran,
         });
         formData.append("procedureTemplateData", procedureTemplateData);
+
+        console.log("TemplateFormData: ", templateFormData);
+
+        if (templateFormData.pindaanDokumen) {
+          const pindaanDokumenData = JSON.stringify({
+            versi: templateFormData?.pindaanDokumen.versi,
+            tarikh: templateFormData?.pindaanDokumen.tarikh,
+            butiran: templateFormData?.pindaanDokumen.butiran,
+            deskripsiPerubahan:
+              templateFormData?.pindaanDokumen.deskripsiPerubahan,
+
+            disediakan: (templateFormData?.pindaanDokumen.disediakan || []).map(
+              (u: any) => (typeof u === "string" ? u : u.userId)
+            ),
+            diluluskan:
+              typeof templateFormData?.pindaanDokumen.diluluskan === "string"
+                ? templateFormData?.pindaanDokumen.diluluskan
+                : (
+                    templateFormData?.pindaanDokumen.diluluskan as {
+                      userId?: string;
+                    }
+                  )?.userId! ?? "",
+
+            assignedTo: data.pindaanDokumen.assignedTo,
+            // assignedTo: (templateFormData?.pindaanDokumen.assignedTo || []).map(
+            //   (u: any) => (typeof u === "string" ? u : u.userId)
+            // ),
+          });
+
+          formData.append("pindaanDokumen", pindaanDokumenData);
+        }
       }
 
       const procedureData = JSON.stringify({
@@ -331,67 +299,58 @@ const ProcedureForm = ({ procedureID }: ProcedureFormProps) => {
         moduleId: data.moduleId,
         categoryId: data.categoryId,
         viewPrivilege: data.viewPrivilege,
-        assignedToIds: data.assignedToIds,
-        // procedureTemplateData: data.procedureTemplateData,
-        approverId: data.approverId,
-        approveStatus: "PENDING",
       });
 
       formData.append("procedureData", procedureData);
 
-      let res = null;
-
-      if (procedureID) {
-        res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/procedure/editProcedure/${procedureID}`,
-          {
-            method: "PUT",
-            headers: {
-              // "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: formData,
-          }
+      if (!procedureID) {
+        triggerGlobalToast(
+          "No procedureID. Please refresh and try again.",
+          "error"
         );
-      } else {
-        res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/procedure/addProcedure`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-            body: formData,
-          }
-        );
+        return;
       }
+
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/procedure/editProcedure/${procedureID}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
 
       const response = await res.json();
+      console.log("Response: ", response);
 
       if (res.ok) {
-        reset();
-
-        toast.success(response.message);
-
-        window.location.href = `/procedure/proceduremanagementform/edit/${response.data.procedureId}`;
-        // router.push(
-        //   `/procedure/proceduremanagementform/edit/${response.data.procedureId}`
-        // );
-
-        console.log(response);
+        triggerGlobalToast(
+          response.message || "Procedure edited successfully!",
+          "success"
+        );
+        getProcedureById(procedureID, version);
       } else {
-        toast.error(response.message);
+        triggerGlobalToast(response.message || response.error, "error");
       }
     } catch (err) {
-      toast.error("An error occured. Please try again.");
+      if (err instanceof Error) {
+        triggerGlobalToast(err.message, "error");
+      } else {
+        triggerGlobalToast("An error occured. Please try again.", "error");
+      }
     }
   };
 
-  const handleDeleteProcedure = async (procedureId: string) => {
-    if (!procedureId) return;
+  const handleDeleteProcedureVersion = async (
+    procedureId: string,
+    version: string
+  ) => {
+    if (!procedureId || !version) return;
 
     const confirmDelete = window.confirm(
-      "Are you sure you want to delete this procedure?"
+      "Are you sure you want to delete this procedure version?"
     );
 
     if (!confirmDelete) {
@@ -399,8 +358,10 @@ const ProcedureForm = ({ procedureID }: ProcedureFormProps) => {
     }
 
     try {
+      const token = localStorage.getItem("jwt") || "";
+
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/procedure/deleteProcedure/${procedureID}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/procedure/deleteProcedure/${procedureId}/${version}`,
         {
           method: "DELETE",
           headers: {
@@ -413,266 +374,111 @@ const ProcedureForm = ({ procedureID }: ProcedureFormProps) => {
       const response = await res.json();
 
       if (res.ok) {
-        toast.success(response.message);
-        window.location.href =
-          "${process.env.NEXT_PUBLIC_API_URL}/procedure/proceduremanagementform";
+        triggerGlobalToast(response.message, "success");
+        router.push(`/procedure/view/${procedureId}`);
       } else {
-        toast.error(response.message);
+        triggerGlobalToast(response.message, "error");
       }
     } catch (error) {
-      toast.error("Failed to delete procedure. Please try again.");
+      triggerGlobalToast(
+        "Failed to delete procedure. Please try again.",
+        "error"
+      );
     }
   };
 
-  function bytesToMB(bytes: number): string {
-    return (bytes / (1024 * 1024)).toFixed(2) + " MB";
-  }
-
   return (
     <div className="flex flex-col items-center justify-center mx-20 my-10">
-      <div className="text-4xl font-extrabold mb-7">Procedure Form</div>
+      <div className="w-full flex items-center">
+        <button type="button" className="btn btn-ghost mb-5">
+          <Link
+            href={procedureID ? `/procedure/view/${procedureID}` : `/procedure`}
+          >
+            <CornerDownLeft className="h-6 w-6" />
+          </Link>
+        </button>
+        <div className="text-4xl font-extrabold mb-7 grow text-center">
+          Procedure Form
+        </div>
+      </div>
+      {/* <div className="text-4xl font-extrabold mb-7">Procedure Form</div> */}
       <div className="w-full px-10 py-6 bg-[#F5F5F5] h-auto rounded-2xl">
         <div>
           <form
             onSubmit={handleSubmit(handleProcedureSubmit)}
             encType="multipart/form-data"
           >
-            <div className="py-3">
-              <fieldset className="flex items-center gap-2">
-                <legend className="fieldset-legend text-base font-semibold float-left w-auto px-1">
-                  Procedure Number:
-                </legend>
-                <input
-                  type="text"
-                  // value={stepFormData?.nomborDokumen || ""}
-                  {...register("procedureNumber", {
-                    required: "Procedure Number is required.",
-                  })}
-                  className="border border-gray-500 bg-white rounded-lg px-3 py-1 text-base w-auto flex-1"
-                />
-              </fieldset>
-              {errors.procedureNumber && (
-                <p className="text-sm pt-1 text-red-500 ml-[calc(160px_+_0.5rem)]">
-                  {errors.procedureNumber.message}
-                </p>
-              )}
-            </div>
+            <ProcedureInfoForm
+              register={register}
+              errors={errors}
+              selectedModule={selectedModule}
+              handleModuleChange={handleModuleChange}
+              selectedCategory={selectedCategory}
+              handleCategoryChange={handleCategoryChange}
+              categoryOptions={categoryOptions}
+            />
+            {/* {watch("pindaanDokumen.assignedTo") && <div>Assignnnnnnn!!</div>}
+            {watch("pindaanDokumen.assignTo") && <div>Assignnnnnnn!23</div>} */}
+            {watch("pindaanDokumen") && (
+              <>
+                <fieldset className="flex items-center gap-2 py-3">
+                  <legend className="fieldset-legend text-base font-semibold float-left w-auto px-1">
+                    Assign To:
+                  </legend>
 
-            <div className="py-3">
-              <fieldset className="flex items-center gap-2">
-                <legend className="fieldset-legend text-base font-semibold float-left w-auto px-1">
-                  Procedure Name:
-                </legend>
-                <input
-                  // value={stepFormData?.namaDokumen || ""}
-                  type="text"
-                  {...register("procedureName", {
-                    required: "Procedure Name is required.",
-                  })}
-                  className="border border-gray-500 bg-white rounded-lg px-3 py-1 text-base w-auto flex-1"
-                />
-              </fieldset>
-              {errors.procedureName && (
-                <p className="text-sm pt-1 text-red-500 ml-[calc(142px_+_0.5rem)]">
-                  {errors.procedureName.message}
-                </p>
-              )}
-            </div>
+                  <UserAsyncSelect
+                    isMulti
+                    label="Assign To:"
+                    value={selectedUsers}
+                    {...register("pindaanDokumen.assignedTo")}
+                    onChange={handleSelectUser}
+                    error={errors.pindaanDokumen?.assignedTo?.message}
+                  />
 
-            <fieldset className="flex items-center gap-2 py-3">
-              <legend className="fieldset-legend text-base font-semibold float-left w-auto px-1">
-                Module:
-              </legend>
-              <ModuleSelect
-                {...register("moduleId", {
-                  required: "Module is required.",
-                })}
-                value={selectedModule}
-                onChange={handleModuleChange}
-              />
-              {errors.moduleId && (
-                <p className="text-sm text-red-500 mt-1 ml-2">
-                  {errors.moduleId.message}
-                </p>
-              )}
-            </fieldset>
-            <fieldset className="flex items-center gap-2 py-3">
-              <legend className="fieldset-legend text-base font-semibold float-left w-auto px-1">
-                Category:
-              </legend>
-              <CategorySelect
-                {...register("categoryId", {
-                  required: "Category is required.",
-                })}
-                options={categoryOptions}
-                value={selectedCategory}
-                onChange={handleCategoryChange}
-                disabled={!selectedModule}
-              />{" "}
-              {errors.categoryId && (
-                <p className="text-sm text-red-500 mt-1 ml-2">
-                  {errors.categoryId.message}
-                </p>
-              )}
-            </fieldset>
+                  {errors.pindaanDokumen?.assignedTo && (
+                    <p className="text-sm ml-2 text-red-500">
+                      {errors.pindaanDokumen?.assignedTo.message}
+                    </p>
+                  )}
+                </fieldset>
 
-            <fieldset className="fieldset w-full py-3 relative px-1">
-              <legend className="fieldset-legend text-base font-semibold">
-                View Privilege:
-              </legend>
-              <label className="fieldset-label text-base font-medium text-black">
-                <input
-                  type="checkbox"
-                  className="checkbox h-5 w-5 rounded-none border border-gray-500 bg-white checked:bg-white"
-                  value="STUDENT"
-                  {...register("viewPrivilege", {
-                    required: "Must have at least one role selected.",
-                  })}
-                />
-                Student
-              </label>
-              <label className="fieldset-label text-base font-medium text-black">
-                <input
-                  type="checkbox"
-                  className="checkbox h-5 w-5 rounded-none border border-gray-500 bg-white checked:bg-white"
-                  value="ACADEMIC_STAFF"
-                  {...register("viewPrivilege", {
-                    required: "Must have at least one role selected.",
-                  })}
-                />
-                Academic Staff
-              </label>
-              <label className="fieldset-label text-base font-medium text-black">
-                <input
-                  type="checkbox"
-                  className="checkbox h-5 w-5 rounded-none border border-gray-500 bg-white checked:bg-white"
-                  value="NON_ACADEMIC_STAFF"
-                  {...register("viewPrivilege", {
-                    required: "Must have at least one role selected.",
-                  })}
-                />
-                Non-Academic Staff
-              </label>
-              {errors.viewPrivilege && (
-                <p className="text-sm text-red-500">
-                  {errors.viewPrivilege.message}
-                </p>
-              )}
-            </fieldset>
+                <div className="w-full flex items-center gap-2 pt-2 pb-4">
+                  <span className="font-semibold">Approve Status: </span>
+                  <div
+                    className={`flex justify-center w-[100px] border-1 p-2 ${
+                      approveStatus === "REJECT"
+                        ? "bg-red-500"
+                        : approveStatus === "APPROVE"
+                        ? "bg-green-500"
+                        : "bg-yellow-400"
+                    }`}
+                  >
+                    {approveStatus}
+                  </div>
+                </div>
 
-            <fieldset className="flex items-center gap-2 py-3">
-              <legend className="fieldset-legend text-base font-semibold float-left w-auto px-1">
-                Assign To:
-              </legend>
-              <AsyncSelect
-                {...register("assignedToIds", {
-                  // required: "Must assigned .",
-                })}
-                cacheOptions
-                defaultOptions
-                isMulti
-                loadOptions={loadUserOptions}
-                isClearable
-                value={selectedUsers}
-                onChange={handleSelectUser}
-                placeholder="Select users"
-                styles={{
-                  control: (base) => ({
-                    ...base,
-                    borderColor: "#6b7280",
-                    borderRadius: "0.5rem",
-                    paddingTop: "0",
-                    paddingBottom: "0",
-                    minWidth: "250px",
-                    width: "auto",
-                    "&:hover": {
-                      borderColor: "#6b7280",
-                    },
-                  }),
-                }}
-              />
-              {errors.assignedToIds && (
-                <p className="text-sm ml-2 text-red-500">
-                  {errors.assignedToIds.message}
-                </p>
-              )}
-            </fieldset>
-
-            {role === "SPK_MANAGER" && (
-              <fieldset className="flex items-center gap-2 py-3">
-                <legend className="fieldset-legend text-base font-semibold float-left w-auto px-1">
-                  Assign Approver:
-                </legend>
-                <AsyncSelect
-                  {...register("approverId", {})}
-                  cacheOptions
-                  defaultOptions
-                  loadOptions={loadUserOptions}
-                  isClearable
-                  value={selectedApprover}
-                  onChange={handleSelectApprover}
-                  placeholder="Select approver"
-                  styles={{
-                    control: (base) => ({
-                      ...base,
-                      borderColor: "#6b7280",
-                      borderRadius: "0.5rem",
-                      paddingTop: "0",
-                      paddingBottom: "0",
-                      minWidth: "250px",
-                      width: "auto",
-                      "&:hover": {
-                        borderColor: "#6b7280",
-                      },
-                    }),
-                  }}
-                />
-                {errors.approverId && (
-                  <p className="text-sm ml-2 text-red-500">
-                    {errors.approverId.message}
-                  </p>
+                {approveStatus !== "APPROVE" && (
+                  <div className="w-full flex items-center gap-2 pt-2 pb-4">
+                    <span className="font-semibold">Reject Description: </span>
+                    <div
+                    // className={`flex justify-center w-[100px] border-1 p-2 ${
+                    //   approveStatus === "REJECT"
+                    //     ? "bg-red-500"
+                    //     : approveStatus === "APPROVE"
+                    //     ? "bg-green-500"
+                    //     : "bg-yellow-400"
+                    // }`}
+                    >
+                      {watch("pindaanDokumen.description") || "No description provided."}
+                    </div>
+                  </div>
                 )}
-              </fieldset>
+              </>
             )}
 
             <div>
-              <div className="flex mt-1">
-                <button
-                  type="button"
-                  className={`border-black border-1 flex items-center p-1 ml-0 my-3 mr-5 ${
-                    selectedProcedureMode === "create"
-                      ? "bg-[#86E78B]"
-                      : "bg-[#D9D9D9]"
-                  }`}
-                  onClick={() => handleSelectProcedureMode("create")}
-                >
-                  {selectedProcedureMode === "create" ? (
-                    <CheckIcon className="h-5 w-5 mx-1"></CheckIcon>
-                  ) : (
-                    <PlusIcon className="h-5 w-5 mx-1"></PlusIcon>
-                  )}
-
-                  <span className="pl-1 pr-2">Create New Procedure</span>
-                </button>
-                <button
-                  type="button"
-                  className={`border-black border-1 flex items-center p-1 m-3 ${
-                    selectedProcedureMode === "upload"
-                      ? "bg-[#86E78B]"
-                      : "bg-[#D9D9D9]"
-                  }`}
-                  onClick={() => handleSelectProcedureMode("upload")}
-                >
-                  {selectedProcedureMode === "upload" ? (
-                    <CheckIcon className="h-5 w-5 mx-1"></CheckIcon>
-                  ) : (
-                    <UploadIcon className="h-5 w-5 mx-1"></UploadIcon>
-                  )}
-
-                  <span className="pl-1 pr-2">Upload Procedure</span>
-                </button>
-              </div>
-              {selectedProcedureMode === "upload" && (
+              {/* upload file */}
+              {!watch("pindaanDokumen") && (
                 <div>
                   <fieldset className="flex items-center gap-2 py-3">
                     <legend className="fieldset-legend text-base font-semibold float-left w-auto px-1">
@@ -701,50 +507,54 @@ const ProcedureForm = ({ procedureID }: ProcedureFormProps) => {
               )}
 
               {fileDownloadUrl && (
-                // {selectedProcedureMode === "upload" && fileDownloadUrl && (
-                <div className="bg-white p-3 rounded-xl flex items-center justify-between w-fit">
-                  {/* File icon */}
-                  <div className="flex items-center">
-                    <File className="w-6 h-6 mx-2" />
-
-                    {/* File name and size */}
-                    <div className="flex flex-col justify-start pl-3 pr-5">
-                      <span className="font-semibold text-[15px]">
-                        <a
-                          href={`http://localhost:8080${fileDownloadUrl}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          {fileName}
-                        </a>
-                      </span>
-                      <span className="font-normal text-[13px]">
-                        {fileSize !== undefined ? bytesToMB(fileSize) : ""}
-                      </span>
-                    </div>
+                <>
+                  <div className="font-semibold w-full py-2">
+                    Uploaded Procedure:{" "}
                   </div>
+                  <div className="bg-white hover:bg-[#dedede] p-3 rounded-xl flex items-center justify-between w-fit">
+                    {/* File icon */}
+                    <div className="flex items-center">
+                      <File className="w-6 h-6 mx-2" />
 
-                  {/* Delete icon on the right */}
-                  <button
-                    type="button"
-                    className="btn btn-ghost p-2 m-0"
-                    onClick={() => {
-                      setValue("procedureFile", undefined); // Clear the file input
-                      setValue("fileName", ""); // Clear the file name
-                      setValue("fileType", ""); // Clear the file type
-                      setValue("fileDownloadUrl", ""); // Clear the file download URL
-                      setValue("fileSize", 0); // Clear the file size
-                    }}
-                  >
-                    <X className="h-5 w-5 text-red-500" />
-                  </button>
-                </div>
+                      {/* File name and size */}
+                      <div className="flex flex-col justify-start pl-3 pr-5">
+                        <span className="font-semibold text-[15px]">
+                          <a
+                            href={`${process.env.NEXT_PUBLIC_API_URL}${fileDownloadUrl}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {fileName}
+                          </a>
+                        </span>
+                        <span className="font-normal text-[13px]">
+                          {fileSize !== undefined ? bytesToMB(fileSize) : ""}
+                        </span>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="btn btn-ghost p-2 m-0"
+                      onClick={() => {
+                        setValue("procedureFile", undefined); // Clear the file input
+                        setValue("fileName", ""); // Clear the file name
+                        setValue("fileType", ""); // Clear the file type
+                        setValue("fileDownloadUrl", ""); // Clear the file download URL
+                        setValue("fileSize", 0); // Clear the file size
+                      }}
+                    >
+                      <X className="h-5 w-5 text-red-500" />
+                    </button>
+                  </div>
+                </>
               )}
 
-              {selectedProcedureMode === "create" && (
-                <StepForm
-                  formData={stepFormData}
-                  setFormData={setStepFormData}
+              {watch("pindaanDokumen") && !fileDownloadUrl && (
+                //watch("procedureData.pindaanDokumen") &&
+                <TemplateForm
+                  formData={templateFormData}
+                  setFormData={setTemplateFormData}
                 />
               )}
             </div>
@@ -759,7 +569,7 @@ const ProcedureForm = ({ procedureID }: ProcedureFormProps) => {
                 <button
                   type="button"
                   onClick={() => {
-                    handleDeleteProcedure(procedureID);
+                    handleDeleteProcedureVersion(procedureID, version);
                   }}
                   className="btn bg-red-600 hover:bg-red-700 text-white border-0"
                 >

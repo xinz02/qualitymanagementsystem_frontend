@@ -57,8 +57,10 @@ export default function CustomNodeBase({
       <NodeResizer
         color="#ff0071"
         isVisible={selected}
-        minWidth={width}
-        minHeight={height}
+        // minWidth={width}
+        // minHeight={height}
+        minWidth={150}
+        minHeight={65}
         onResizeEnd={(event, params: { width: any; height: any }) => {
           try {
             setNodes((nds) =>
@@ -68,6 +70,7 @@ export default function CustomNodeBase({
                       ...node,
                       width: params.width,
                       height: params.height,
+
                       style: {
                         ...node.style,
                         width: params.width,
@@ -88,7 +91,7 @@ export default function CustomNodeBase({
           width: width,
           height: height,
           minWidth: "150px",
-          minHeight: "80px",
+          minHeight: "65px",
           border: focused
             ? "2px solid #555" // If focused
             : hasLabel
@@ -169,9 +172,7 @@ export default function CustomNodeBase({
               width: "100%",
               height: "100%",
               resize: "none",
-              // resize: "both",
-              // minHeight: "5px",
-              // minWidth: "60px",
+              alignContent: "center",
               fontSize: "12px",
               color: hasLabel ? "#656565" : "#000",
             }}
