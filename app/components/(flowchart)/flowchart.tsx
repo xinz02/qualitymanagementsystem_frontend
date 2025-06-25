@@ -1,10 +1,18 @@
 import { FlowChartData } from "@/app/interface/FlowChartData";
 import React from "react";
 import { useRef, useState } from "react";
-import FlowChartTemplate from "./(flowcharttemplate)/flowcharttemplate";
+// import FlowChartTemplate from "./(flowcharttemplate)/flowcharttemplate";
 import { PlusIcon, TrashIcon } from "lucide-react";
 import UploadEvidence from "./uploadevidence/uploadevidence";
 import { Node } from "@xyflow/react";
+import dynamic from "next/dynamic";
+
+
+const FlowChartTemplate = dynamic(
+  () => import("./(flowcharttemplate)/flowcharttemplate"),
+  { ssr: false }
+);
+
 
 interface FlowChartsProps {
   flowChartId: string;

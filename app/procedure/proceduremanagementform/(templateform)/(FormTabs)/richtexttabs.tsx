@@ -1,6 +1,13 @@
 import React from "react";
 import { ProcedureTemplateFormData } from "@/app/interface/ProcedureTemplateFormData";
-import RichTextEditor from "@/app/components/(richtexteditor)/richtexteditor";
+// import RichTextEditor from "@/app/components/(richtexteditor)/richtexteditor";
+
+import dynamic from "next/dynamic";
+
+const RichTextEditor = dynamic(
+  () => import("@/app/components/(richtexteditor)/richtexteditor"),
+  { ssr: false }
+);
 
 interface RichTextTabProps {
   formData: ProcedureTemplateFormData;
