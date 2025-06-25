@@ -1,12 +1,9 @@
 "use client";
 
 import LoadingSpinner from "@/app/components/(common)/loadingspinner";
-import ProcedurePDFViewer from "@/app/components/(pdf)/pdfviewer";
+// import ProcedurePDFViewer from "@/app/components/(pdf)/pdfviewer";
 import { FlowChartsEvidenceFileData } from "@/app/interface/EvidenceFile";
-import {
-  Procedure,
-  ProcedureVersion,
-} from "@/app/interface/Procedure";
+import { Procedure, ProcedureVersion } from "@/app/interface/Procedure";
 import { PindaanDokumenSimplified } from "@/app/interface/ProcedureTemplateFormData";
 import {
   CornerDownLeft,
@@ -28,6 +25,15 @@ import {
 } from "../../proceduremanagement";
 import { triggerGlobalToast } from "@/app/components/(common)/toast/showtoast";
 import UpdateProcedureStatusModal from "./updateprocedurestatusmodal";
+
+import dynamic from "next/dynamic";
+
+const ProcedurePDFViewer = dynamic(
+  () => import("@/app/components/(pdf)/pdfviewer"),
+  {
+    ssr: false,
+  }
+);
 
 interface DisplayProcedurePageProps {
   procedure: Procedure | null;
@@ -204,7 +210,6 @@ const DisplayProcedurePage = ({
                       role="tabpanel"
                       className="tab-content bg-base-100 border-base-300 rounded-box w-full min-h-[100vh]"
                     >
-                      
                       <ProcedurePDFViewer
                         key={
                           displayProcedureVersion?.pindaanDokumen?.versi ||

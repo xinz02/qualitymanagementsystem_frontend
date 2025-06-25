@@ -1,6 +1,13 @@
 import { ProcedureTemplateFormTabData } from "@/app/interface/ProcedureTemplateFormTabData";
 import React from "react";
-import FlowCharts from "@/app/components/(flowchart)/flowchart";
+// import FlowCharts from "@/app/components/(flowchart)/flowchart";
+
+import dynamic from "next/dynamic";
+
+const FlowCharts = dynamic(
+  () => import("@/app/components/(flowchart)/flowchart"),
+  { ssr: false }
+);
 
 const FlowChartTab = ({
   formData,
