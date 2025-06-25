@@ -21,7 +21,15 @@ import ProcedureHeader from "@/app/components/(pdf)/pdfheader";
 import ProcedureFooter from "@/app/components/(pdf)/pdffooter";
 import CoverPagePDF from "@/app/components/(pdf)/coverpage";
 import HTMLToPDF from "@/app/components/(pdf)/htmltopdf";
-import FlowChartExport from "@/app/components/(pdf)/flowchartexport";
+// import FlowChartExport from "@/app/components/(pdf)/flowchartexport";
+import dynamic from "next/dynamic";
+
+const FlowChartExport = dynamic(
+  () => import("@/app/components/(pdf)/flowchartexport"),
+  {
+    ssr: false,
+  }
+);
 
 interface ProcedurePDFViewerProps {
   pindaanDokumen: PindaanDokumenSimplified[];
@@ -92,7 +100,6 @@ const ProcedurePDFViewer = ({
   templateData,
   onPDFReady,
 }: ProcedurePDFViewerProps) => {
-  
   const [mainFlowImage, setMainFlowImage] = useState<
     { id: string; title: string; image: string }[]
   >([]);
