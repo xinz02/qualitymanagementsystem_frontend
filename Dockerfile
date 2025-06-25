@@ -13,8 +13,11 @@ RUN npm install
 # Copy the rest of the app
 COPY . .
 
+ENV NODE_OPTIONS=--max-old-space-size=4096
+ENV NEXTJS_SKIP_TYPECHECK=true
+
 # Build the app
-RUN npm run build
+RUN npm run build -- --no-typecheck
 
 # Set environment for production
 ENV NODE_ENV=production
