@@ -249,7 +249,7 @@ const FormManagementForm = ({ formID }: FormsFormProps) => {
         getFormById(response.data.formId);
 
         if (!formID) {
-          router.push(`/forms/formmanagementform/edit/${response.data.formId}`);
+          router.push(`/forms/edit/${response.data.formId}`);
         }
       } else {
         triggerGlobalToast(
@@ -438,7 +438,7 @@ const FormManagementForm = ({ formID }: FormsFormProps) => {
                 {...register("personInChargeId", {
                   required: "Person In Charge is required.",
                 })}
-                label="Assign Approver:"
+               
                 value={selectedPersonInCharge}
                 onChange={handleSelectPersonInCharge}
               />
