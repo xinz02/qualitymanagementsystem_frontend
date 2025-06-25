@@ -551,19 +551,16 @@ import React from "react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
-  Procedure,
   ProcedureList,
   ProcedureListInfo,
 } from "../interface/Procedure";
 import LoadingSpinner from "../components/(common)/loadingspinner";
 import { Plus } from "lucide-react";
-import { toast } from "react-toastify";
 import {
   ModuleProvider,
   useModuleContext,
 } from "../components/(context)/modulecontext";
 import { Module } from "../interface/Module";
-import ProcedureInfoForm from "./proceduremanagementform/procedureinfoform";
 import CreateProcedureModal from "./view/[id]/createproceduremodal";
 import { triggerGlobalToast } from "../components/(common)/toast/showtoast";
 
@@ -571,7 +568,6 @@ const ProceduresPageDisplay = () => {
   const { allModules } = useModuleContext();
 
   const [role, setRole] = useState("");
-  const [userId, setUserId] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [accessibleProcedures, setAccessibleProcedures] = useState<
     ProcedureListInfo[]
@@ -607,10 +603,10 @@ const ProceduresPageDisplay = () => {
 
       if (jwtToken !== "") {
         setRole(localStorage.getItem("userRole") || "");
-        setUserId(localStorage.getItem("userId") || "");
+        
       } else {
         setRole("STUDENT");
-        setUserId("");
+       
       }
       console.log("role", localStorage.getItem("userRole"));
 
@@ -673,57 +669,9 @@ const ProceduresPageDisplay = () => {
     }
   }, [role]);
 
-  // useEffect(() => {
-  //   let filtered = accessibleProcedures;
-
-  //   if (searchQuery) {
-  //     filtered = filtered.filter(
-  //       (procedure) =>
-  //         procedure.procedureName
-  //           .toLowerCase()
-  //           .includes(searchQuery.toLowerCase()) ||
-  //         procedure.procedureNumber
-  //           .toLowerCase()
-  //           .includes(searchQuery.toLowerCase())
-  //     );
-  //   }
-
-  //   if (filterModule) {
-  //     filtered = filtered.filter(
-  //       (procedure) => procedure.module.moduleId === filterModule.moduleId
-  //     );
-  //   }
-
-  //   setDisplayProcedures(filtered);
-  //   setCurrentPage(1);
-  // }, [searchQuery, filterModule, accessibleProcedures]);
-
-  // useEffect(() => {
-  //   let filtered = accessibleProcedures.filter(
-  //     (procedure) => procedure.procedureApproveStatus !== null
-  //   );
-
-  //   if (approveStatus === "All") {
-  //     setDisplayProcedures(accessibleProcedures);
-  //   }
-
-  //   if (approveStatus && approveStatus !== "All") {
-  //     filtered = filtered.filter(
-  //       (procedure) =>
-  //         procedure.procedureApproveStatus.toLowerCase() ===
-  //         approveStatus.toLowerCase()
-  //     );
-  //   }
-
-  //   console.log("ApproveStatus: ", approveStatus);
-  //   console.log("Filetered: ", filtered);
-
-  //   setDisplayProcedures(filtered);
-  // }, [approveStatus, accessibleProcedures]);
-
   useEffect(() => {
     // Decide the source list based on the selected tab
-    let sourceProcedures =
+    const sourceProcedures =
       activeTab === "assigned" ? assignedProcedures : accessibleProcedures;
 
     // Initial filter by non-null approve status
@@ -772,7 +720,7 @@ const ProceduresPageDisplay = () => {
   ]);
 
   useEffect(() => {
-    let sourceProcedures =
+    const sourceProcedures =
       activeTab === "assigned" ? assignedProcedures : accessibleProcedures;
 
     let filtered = sourceProcedures;

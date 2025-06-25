@@ -3,9 +3,9 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import { User } from "../interface/User";
-import { toast } from "react-toastify";
 import { Plus } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { triggerGlobalToast } from "../components/(common)/toast/showtoast";
 
 const UserManagementPage = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -35,8 +35,19 @@ const UserManagementPage = () => {
 
       console.log(data);
       setUsers(user);
+
+      if (!res.ok) {
+        throw new Error(data.message || data.error || "Failed to fetch users");
+      }
     } catch (err) {
-      console.log("Error occurs. Please try again later");
+      if (err instanceof Error) {
+        triggerGlobalToast(err.message, "error");
+      } else {
+        triggerGlobalToast(
+          "An unknown error occurred. Please try again later.",
+          "error"
+        );
+      }
     }
   };
 
@@ -84,13 +95,22 @@ const UserManagementPage = () => {
           document.getElementById("edit_user_modal") as HTMLDialogElement
         )?.close();
         setEditingUser(null);
-
-        toast.success(data.message);
+        triggerGlobalToast(
+          data.message || "User updated successfully",
+          "success"
+        );
       } else {
-        toast.error(data.message);
+        throw new Error(data.message || data.error || "Failed to update user");
       }
     } catch (err) {
-      toast.error("An error occured. Please try again.");
+      if (err instanceof Error) {
+        triggerGlobalToast(err.message, "error");
+      } else {
+        triggerGlobalToast(
+          "An unknown error occurred. Please try again later.",
+          "error"
+        );
+      }
     }
   };
 
@@ -122,12 +142,22 @@ const UserManagementPage = () => {
 
         reset();
 
-        toast.success(data.message);
+        triggerGlobalToast(
+          data.message || "User added successfully",
+          "success"
+        );
       } else {
-        toast.error(data.message);
+        throw new Error(data.message || data.error || "Failed to add user");
       }
     } catch (err) {
-      toast.error("An error occured. Please try again.");
+      if (err instanceof Error) {
+        triggerGlobalToast(err.message, "error");
+      } else {
+        triggerGlobalToast(
+          "An unknown error occurred. Please try again later.",
+          "error"
+        );
+      }
     }
   };
 
@@ -166,12 +196,22 @@ const UserManagementPage = () => {
         )?.close();
         setDeleteUser(null);
 
-        toast.success(data.message);
+        triggerGlobalToast(
+          data.message || "User deleted successfully",
+          "success"
+        );
       } else {
-        toast.error(data.message);
+        throw new Error(data.message || data.error || "Failed to delete user");
       }
     } catch (err) {
-      toast.error("An error occured. Please try again.");
+      if (err instanceof Error) {
+        triggerGlobalToast(err.message, "error");
+      } else {
+        triggerGlobalToast(
+          "An unknown error occurred. Please try again later.",
+          "error"
+        );
+      }
     }
   };
 

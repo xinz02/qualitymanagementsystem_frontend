@@ -5,7 +5,6 @@ import ProcedurePDFViewer from "@/app/components/(pdf)/pdfviewer";
 import { FlowChartsEvidenceFileData } from "@/app/interface/EvidenceFile";
 import {
   Procedure,
-  ProcedureApproveStatus,
   ProcedureVersion,
 } from "@/app/interface/Procedure";
 import { PindaanDokumenSimplified } from "@/app/interface/ProcedureTemplateFormData";
@@ -28,7 +27,6 @@ import {
   handleDeleteProcedure,
 } from "../../proceduremanagement";
 import { triggerGlobalToast } from "@/app/components/(common)/toast/showtoast";
-import { useForm } from "react-hook-form";
 import UpdateProcedureStatusModal from "./updateprocedurestatusmodal";
 
 interface DisplayProcedurePageProps {
@@ -41,7 +39,6 @@ const DisplayProcedurePage = ({
   displayProcedureVersion,
 }: DisplayProcedurePageProps) => {
   console.log("DisplayProcedurePage Props: ", displayProcedureVersion);
-  const token = localStorage.getItem("jwt") || "";
   const role = localStorage.getItem("userRole") || "STUDENT";
   const userId = localStorage.getItem("userId") || "";
 

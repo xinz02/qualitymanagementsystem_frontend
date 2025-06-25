@@ -3,7 +3,6 @@
 
 import dynamic from "next/dynamic";
 import React from "react";
-import { User } from "@/app/interface/User";
 import { SelectOption } from "@/app/interface/SelectOption";
 import { useUserContext } from "../(context)/usercontext";
 
@@ -13,8 +12,8 @@ interface UserAsyncSelectProps {
   isMulti?: boolean;
   value: SelectOption | SelectOption[] | null;
   onChange: (value: unknown) => void;
-  label: string;
-  error?: string;
+  // label: string;
+  // error?: string;
   // allUsers: User[];
   placeholder?: string;
   isApprover?: boolean;
@@ -25,8 +24,8 @@ const UserAsyncSelect: React.FC<UserAsyncSelectProps> = ({
   isMulti = false,
   value,
   onChange,
-  label,
-  error,
+  // label,
+  // error,
   // allUsers,
   isApprover = false,
   isFullWidth = false,

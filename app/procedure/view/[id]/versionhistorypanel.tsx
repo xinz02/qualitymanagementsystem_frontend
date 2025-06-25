@@ -1,9 +1,8 @@
 // components/VersionHistoryPanel.jsx
 import React, { useEffect, useState } from "react";
-import { History, Clock, UserPen, Eye, Download, X, Plus } from "lucide-react";
+import { History, Clock, UserPen, Eye, X, Plus } from "lucide-react";
 import { PindaanDokumenVO } from "@/app/interface/ProcedureTemplateFormData";
 import { User } from "@/app/interface/User";
-import CreateProcedureModal from "./createproceduremodal";
 import CreateNewVersionModal from "./createnewversion";
 import { triggerGlobalToast } from "@/app/components/(common)/toast/showtoast";
 
@@ -160,7 +159,7 @@ const VersionHistoryPanel = ({
             </div>
           ) : (
             <div className="space-y-3">
-              {versions.map((version, index) => (
+              {versions.map((version) => (
                 <div
                   key={version.versi}
                   className={`card bg-base-100 shadow-sm border cursor-pointer hover:shadow-md transition-all ${

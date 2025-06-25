@@ -1,10 +1,8 @@
-import React, { use, useEffect } from "react";
+import React, { useEffect } from "react";
 import { ProcedureTemplateFormTabData } from "@/app/interface/ProcedureTemplateFormTabData";
-import { Trash } from "lucide-react";
 import UserAsyncSelect from "@/app/components/(dropdownselect)/userselect";
 import { useState } from "react";
 import { SelectOption } from "@/app/interface/SelectOption";
-import { User } from "@/app/interface/User";
 
 const BasicInfoTab = ({
   formData,
@@ -183,7 +181,6 @@ const BasicInfoTab = ({
           /> */}
           <UserAsyncSelect
             isMulti
-            label="Disediakan"
             value={selectedDisediakan}
             onChange={(val) =>
               handleUserSelect(val, true, "disediakan", setSelectedDisediakan)
@@ -224,7 +221,6 @@ const BasicInfoTab = ({
           /> */}
           <UserAsyncSelect
             isMulti={false}
-            label="Diluluskan"
             value={selectedDiluluskan}
             onChange={(val) =>
               handleUserSelect(val, false, "diluluskan", setSelectedDiluluskan)

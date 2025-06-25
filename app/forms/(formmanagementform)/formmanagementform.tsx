@@ -9,13 +9,11 @@ import { SelectOption } from "@/app/interface/SelectOption";
 import { CornerDownLeft, File, X } from "lucide-react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import { toast } from "react-toastify";
 import { bytesToMB } from "@/app/procedure/proceduremanagement";
 import { FormFormData } from "@/app/interface/FormInterface";
 import { triggerGlobalToast } from "@/app/components/(common)/toast/showtoast";
 import { useRouter } from "next/navigation";
 import ProcedureSelect from "@/app/components/(dropdownselect)/procedureselect";
-import { useUserContext } from "@/app/components/(context)/usercontext";
 import { handleDeleteForm } from "../formmanagement";
 
 interface FormsFormProps {
@@ -23,7 +21,7 @@ interface FormsFormProps {
 }
 
 const FormManagementForm = ({ formID }: FormsFormProps) => {
-  const [selectedUsers, setSelectedUsers] = useState<SelectOption[]>([]);
+  // const [selectedUsers, setSelectedUsers] = useState<SelectOption[]>([]);
   const [categoryOptions, setCategoryOptions] = useState<SelectOption[]>([]);
   const [selectedModule, setSelectedModule] = useState<SelectOption | null>(
     null
@@ -36,8 +34,6 @@ const FormManagementForm = ({ formID }: FormsFormProps) => {
   const [selectedProcedure, setSelectedProcedure] =
     useState<SelectOption | null>(null);
 
-  // const { allUsers } = useUserContext();
-
   const {
     register,
     handleSubmit,
@@ -49,7 +45,7 @@ const FormManagementForm = ({ formID }: FormsFormProps) => {
   const router = useRouter();
 
   const fileName = watch("fileName");
-  const fileType = watch("fileType");
+  // const fileType = watch("fileType");
   const fileDownloadUrl = watch("fileDownloadUrl");
   const fileSize = watch("fileSize");
 
@@ -82,14 +78,16 @@ const FormManagementForm = ({ formID }: FormsFormProps) => {
         }
       );
 
-      if (!res.ok) {
-        throw new Error("Failed to fetch form");
-      }
-
       const result = await res.json();
       const formData = result.data;
 
       console.log("formData: ", formData);
+
+      if (!res.ok) {
+        throw new Error(
+          result.message || result.error || "Failed to fetch form"
+        );
+      }
 
       if (!formData) {
         throw new Error("No form data found");
@@ -160,9 +158,14 @@ const FormManagementForm = ({ formID }: FormsFormProps) => {
         setValue("fileSize", formData.fileSize);
       }
     } catch (error) {
-      // console.error("Failed to load procedure:", error);
-      // toast.error("Failed to load procedure data");
-      triggerGlobalToast("Failed to load procedure data", "error");
+      if (error instanceof Error) {
+        triggerGlobalToast(error.message, "error");
+      } else {
+        triggerGlobalToast(
+          "An unknown error occurred. Please try again later.",
+          "error"
+        );
+      }
     }
   };
 
@@ -239,7 +242,6 @@ const FormManagementForm = ({ formID }: FormsFormProps) => {
       const response = await res.json();
 
       if (res.ok) {
-        // toast.success(response.message);
         triggerGlobalToast(
           response.message || "Form uploaded successfully!",
           "success"
@@ -250,7 +252,6 @@ const FormManagementForm = ({ formID }: FormsFormProps) => {
           router.push(`/forms/formmanagementform/edit/${response.data.formId}`);
         }
       } else {
-        // toast.error(response.message);
         triggerGlobalToast(
           response.message ||
             response.error ||
@@ -259,7 +260,6 @@ const FormManagementForm = ({ formID }: FormsFormProps) => {
         );
       }
     } catch (err) {
-      // toast.error("An error occured. Please try again.");
       if (err instanceof Error) {
         triggerGlobalToast(err.message, "error");
       } else {

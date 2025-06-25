@@ -1,15 +1,8 @@
-import {
-  EvidenceFileData,
-  EvidenceFileFormData,
-} from "@/app/interface/EvidenceFile";
-import { FileX, SquarePen, Trash2, Upload } from "lucide-react";
+import { EvidenceFileData } from "@/app/interface/EvidenceFile";
+import { SquarePen, Trash2 } from "lucide-react";
 import React from "react";
 import { useEffect, useState } from "react";
-import UserAsyncSelect from "../../(dropdownselect)/userselect";
-import { SelectOption } from "@/app/interface/SelectOption";
-import { useUserContext } from "../../(context)/usercontext";
 import Link from "next/link";
-import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { Node } from "@xyflow/react";
 import { fetchEvidenceFilesByNode } from "@/app/procedure/proceduremanagement";
@@ -19,11 +12,7 @@ interface UploadEvidenceProps {
   selectedNode: Node;
 }
 
-const UploadEvidence = ({
-  selectedNode,
-}: 
-UploadEvidenceProps) => {
-
+const UploadEvidence = ({ selectedNode }: UploadEvidenceProps) => {
   const [evidenceFiles, setEvidenceFiles] = useState<EvidenceFileData[]>([]);
   const [editFileId, setEditFileId] = useState<string | null>(null);
 

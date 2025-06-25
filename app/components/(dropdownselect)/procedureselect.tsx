@@ -1,10 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
-import { Module } from "@/app/interface/Module";
+import { useState } from "react";
 import { SelectOption } from "@/app/interface/SelectOption";
-import { ActionMeta } from "react-select";
 import { ProcedureInfo } from "@/app/interface/Procedure";
 
 const AsyncSelect = dynamic(() => import("react-select/async"), { ssr: false });
@@ -15,7 +13,7 @@ interface ProcedureSelectProps {
 }
 
 const ProcedureSelect = ({ value, onChange }: ProcedureSelectProps) => {
-  const [allProcedures, setAllProcedures] = useState<ProcedureInfo[]>([]);
+  // const [allProcedures, setAllProcedures] = useState<ProcedureInfo[]>([]);
 
   //   const loadProcedureOptions = async (inputValue: string) => {
   //     try {
@@ -49,7 +47,7 @@ const ProcedureSelect = ({ value, onChange }: ProcedureSelectProps) => {
       const result = await res.json();
       const data: ProcedureInfo[] = result.data ?? [];
 
-      setAllProcedures(data);
+      // setAllProcedures(data);
 
       const filtered = data.filter((procedure) =>
         procedure.procedureName.toLowerCase().includes(inputValue.toLowerCase())

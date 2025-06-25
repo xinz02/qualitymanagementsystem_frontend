@@ -26,7 +26,6 @@ import { DnDProvider, useDnD } from "../draganddrop/DnDContext";
 import { FlowChartData } from "@/app/interface/FlowChartData";
 import { v4 as uuidv4 } from "uuid";
 import { useEffect, useState } from "react";
-import UploadEvidence from "../uploadevidence/uploadevidence";
 
 interface FlowChartTemplateComponentsProps {
   flowChartId: string;

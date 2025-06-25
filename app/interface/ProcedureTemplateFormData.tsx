@@ -58,4 +58,3 @@ export interface PindaanDokumenSimplified {
   // approveStatus: string;
   // description?: string;
 }
-

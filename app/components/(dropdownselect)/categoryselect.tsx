@@ -2,7 +2,6 @@
 
 import dynamic from "next/dynamic";
 import { SelectOption } from "@/app/interface/SelectOption";
-import { ActionMeta } from "react-select";
 
 const Select = dynamic(() => import("react-select"), { ssr: false });
 

@@ -27,7 +27,6 @@ const EvidenceUploadRow = ({
   onCancel,
   evidence,
 }: Props) => {
-  const { allUsers } = useUserContext();
   const [selectedPersonInCharge, setSelectedPersonInCharge] =
     useState<SelectOption | null>(null);
 
@@ -184,10 +183,8 @@ const EvidenceUploadRow = ({
             {...register("evidenceInfoData.personInCharge", {
               required: "Person In Charge is required.",
             })}
-            label="Person In Charge:"
             value={selectedPersonInCharge}
             onChange={handleSelectPersonInCharge}
-            // allUsers={allUsers}
           />
         </fieldset>
         {errors.evidenceInfoData?.personInCharge && (

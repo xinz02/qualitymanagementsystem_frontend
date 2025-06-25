@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Module } from "@/app/interface/Module";
 import { SelectOption } from "@/app/interface/SelectOption";
 import { ActionMeta } from "react-select";

@@ -9,11 +9,6 @@ import { useProcedureFormFields } from "../../proceduremanagement";
 import { triggerGlobalToast } from "@/app/components/(common)/toast/showtoast";
 import { User } from "@/app/interface/User";
 
-// interface CreateNewVersionModalProps {
-//   procedureId: string;
-//   latestversion: number;
-//   assignTos: string[];
-// }
 interface CreateNewVersionModalProps {
   procedureId: string;
   latestversion: number;
@@ -31,7 +26,6 @@ const CreateNewVersionModal = ({
     register,
     handleSubmit,
     setValue,
-    watch,
     formState: { errors },
   } = useForm<ProcedureFormData>();
 
@@ -205,7 +199,6 @@ const CreateNewVersionModal = ({
                   <div className="flex-1">
                     <UserAsyncSelect
                       isMulti
-                      label="Assign To"
                       value={selectedUsers}
                       {...register("pindaanDokumen.assignedTo", {
                         required: "Must assign at least one user.",

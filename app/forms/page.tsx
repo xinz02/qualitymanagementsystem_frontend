@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useState, useEffect } from "react";
-import { Download, Plus, SquarePen, Trash2 } from "lucide-react";
+import { Plus } from "lucide-react";
 import { FormInfo } from "../interface/FormInterface";
 import { triggerGlobalToast } from "../components/(common)/toast/showtoast";
 import { Module } from "../interface/Module";
@@ -15,7 +15,7 @@ import {
 const FormPageDisplay = () => {
   const [role, setRole] = useState("");
   const [userId, setUserId] = useState("");
-  const [token, setToken] = useState("");
+  // const [token, setToken] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [forms, setForms] = useState<FormInfo[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -80,7 +80,7 @@ const FormPageDisplay = () => {
 
   useEffect(() => {
     const jwtToken = localStorage.getItem("jwt") || "";
-    setToken(jwtToken);
+   
 
     if (jwtToken !== "") {
       const userRole = localStorage.getItem("userRole") || "";
@@ -266,7 +266,7 @@ const FormPageDisplay = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {displayForms.map((forms, index) => (
+                  {currentForms.map((forms, index) => (
                     <tr key={forms.formId} className="hover:bg-base-300">
                       <td
                         className={`px-8 ${

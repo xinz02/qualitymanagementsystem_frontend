@@ -7,14 +7,8 @@ import { File, X, CornerDownLeft } from "lucide-react";
 import { ProcedureTemplateFormData } from "@/app/interface/ProcedureTemplateFormData";
 import { useForm } from "react-hook-form";
 import { ProcedureFormData } from "@/app/interface/Procedure";
-import { toast } from "react-toastify";
-import {
-  bytesToMB,
-  handleDeleteProcedure,
-  useProcedureFormFields,
-} from "../proceduremanagement";
+import { bytesToMB, useProcedureFormFields } from "../proceduremanagement";
 import UserAsyncSelect from "@/app/components/(dropdownselect)/userselect";
-import { useUserContext } from "@/app/components/(context)/usercontext";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { triggerGlobalToast } from "@/app/components/(common)/toast/showtoast";
@@ -27,12 +21,12 @@ interface ProcedureFormProps {
 }
 
 const ProcedureForm = ({ procedureID, version }: ProcedureFormProps) => {
-  const [role, setRole] = useState("STUDENT");
+  // const [role, setRole] = useState("STUDENT");
   const [token, setToken] = useState("");
-  const [userId, setUserId] = useState("");
-  const [selectedApprover, setSelectedApprover] = useState<SelectOption | null>(
-    null
-  );
+  // const [userId, setUserId] = useState("");
+  // const [selectedApprover, setSelectedApprover] = useState<SelectOption | null>(
+  //   null
+  // );
   const [approveStatus, setApproveStatus] = useState<string>("PENDING");
   const [templateFormData, setTemplateFormData] =
     useState<ProcedureTemplateFormData | null>(null);
@@ -42,7 +36,6 @@ const ProcedureForm = ({ procedureID, version }: ProcedureFormProps) => {
   const {
     register,
     handleSubmit,
-    getValues,
     setValue,
     watch,
     formState: { errors },
@@ -63,15 +56,15 @@ const ProcedureForm = ({ procedureID, version }: ProcedureFormProps) => {
   } = useProcedureFormFields(setValue);
 
   const fileName = watch("fileName");
-  const fileType = watch("fileType");
+  // const fileType = watch("fileType");
   const fileDownloadUrl = watch("fileDownloadUrl");
   const fileSize = watch("fileSize");
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setRole(localStorage.getItem("userRole") || "STUDENT");
+      // setRole(localStorage.getItem("userRole") || "STUDENT");
       setToken(localStorage.getItem("jwt") || "");
-      setUserId(localStorage.getItem("userId") || "");
+      // setUserId(localStorage.getItem("userId") || "");
     }
   }, []);
 
@@ -281,7 +274,7 @@ const ProcedureForm = ({ procedureID, version }: ProcedureFormProps) => {
                     templateFormData?.pindaanDokumen.diluluskan as {
                       userId?: string;
                     }
-                  )?.userId! ?? "",
+                  )?.userId ?? "",
 
             assignedTo: data.pindaanDokumen.assignedTo,
             // assignedTo: (templateFormData?.pindaanDokumen.assignedTo || []).map(
@@ -377,13 +370,23 @@ const ProcedureForm = ({ procedureID, version }: ProcedureFormProps) => {
         triggerGlobalToast(response.message, "success");
         router.push(`/procedure/view/${procedureId}`);
       } else {
-        triggerGlobalToast(response.message, "error");
+        throw new Error(
+          response.message || response.error || "Failed to delete procedure"
+        );
       }
     } catch (error) {
-      triggerGlobalToast(
-        "Failed to delete procedure. Please try again.",
-        "error"
-      );
+      if (error instanceof Error) {
+        triggerGlobalToast(
+          error.message ||
+            "Failed to delete procedure. Please try again later.",
+          "error"
+        );
+      } else {
+        triggerGlobalToast(
+          "An unknown error occurred. Please try again later.",
+          "error"
+        );
+      }
     }
   };
 
@@ -428,11 +431,10 @@ const ProcedureForm = ({ procedureID, version }: ProcedureFormProps) => {
 
                   <UserAsyncSelect
                     isMulti
+                    {...register("pindaanDokumen.assignedTo")}
                     label="Assign To:"
                     value={selectedUsers}
-                    {...register("pindaanDokumen.assignedTo")}
                     onChange={handleSelectUser}
-                    error={errors.pindaanDokumen?.assignedTo?.message}
                   />
 
                   {errors.pindaanDokumen?.assignedTo && (
@@ -469,7 +471,8 @@ const ProcedureForm = ({ procedureID, version }: ProcedureFormProps) => {
                     //     : "bg-yellow-400"
                     // }`}
                     >
-                      {watch("pindaanDokumen.description") || "No description provided."}
+                      {watch("pindaanDokumen.description") ||
+                        "No description provided."}
                     </div>
                   </div>
                 )}

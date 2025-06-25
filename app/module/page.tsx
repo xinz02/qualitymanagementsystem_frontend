@@ -14,6 +14,7 @@ import {
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { Category } from "../interface/Category";
+import { triggerGlobalToast } from "../components/(common)/toast/showtoast";
 
 const ModulePage = () => {
   const {
@@ -71,12 +72,22 @@ const ModulePage = () => {
       const result = await res.json();
       const data: Module[] = result.data;
 
-      setModules(data);
-      console.log(data);
+      if (!res.ok) {
+        throw new Error(
+          result.message || result.error || "Failed to fetch module."
+        );
+      }
 
-      console.log("Fetched");
+      setModules(data);
     } catch (err) {
-      console.log("Error occurs. Please try again later");
+      if (err instanceof Error) {
+        triggerGlobalToast(err.message, "error");
+      } else {
+        triggerGlobalToast(
+          "An unknown error occurred. Please try again later.",
+          "error"
+        );
+      }
     }
   };
 
@@ -158,12 +169,24 @@ const ModulePage = () => {
         // await fetchModules();
         // setSelectedModule(null);
         reset();
-        toast.success(response.message);
+        triggerGlobalToast(
+          response.message || "Module added successfully!",
+          "success"
+        );
       } else {
-        toast.error(response.message);
+        throw new Error(
+          response.message || response.error || "Failed to delete module."
+        );
       }
     } catch (err) {
-      toast.error("An error occured. Please try again.");
+      if (err instanceof Error) {
+        triggerGlobalToast(err.message, "error");
+      } else {
+        triggerGlobalToast(
+          "An unknown error occurred. Please try again later.",
+          "error"
+        );
+      }
     }
   };
 
@@ -210,12 +233,24 @@ const ModulePage = () => {
         setCategoriesToBeDelete([]);
 
         reset();
-        toast.success(response.message);
+        triggerGlobalToast(
+          response.message || "Module edited successfully!",
+          "success"
+        );
       } else {
-        toast.error(response.message);
+        throw new Error(
+          response.message || response.error || "Failed to delete module."
+        );
       }
     } catch (err) {
-      toast.error("An error occured. Please try again.");
+      if (err instanceof Error) {
+        triggerGlobalToast(err.message, "error");
+      } else {
+        triggerGlobalToast(
+          "An unknown error occurred. Please try again later.",
+          "error"
+        );
+      }
     }
   };
 
@@ -243,14 +278,26 @@ const ModulePage = () => {
       const response = await res.json();
 
       if (res.ok) {
-        toast.success(response.message || "Module deleted successfully!");
+        triggerGlobalToast(
+          response.message || "Module deleted successfully!",
+          "success"
+        );
         await fetchModules(); // Refresh module list
         setSelectedModule(null); // Clear selected module
       } else {
-        toast.error(response.message || "Failed to delete module.");
+        throw new Error(
+          response.message || response.error || "Failed to delete module."
+        );
       }
     } catch (error) {
-      toast.error("An error occurred while deleting the module.");
+      if (error instanceof Error) {
+        triggerGlobalToast(error.message, "error");
+      } else {
+        triggerGlobalToast(
+          "An unknown error occurred. Please try again later.",
+          "error"
+        );
+      }
     }
   };
 

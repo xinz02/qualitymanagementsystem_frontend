@@ -2,7 +2,6 @@ import React from "react";
 import Link from "next/link";
 import { NodeEvidenceFile } from "@/app/interface/EvidenceFile";
 import { Node } from "@xyflow/react";
-import { FlowChartData } from "@/app/interface/FlowChartData";
 
 interface EvidenceTableProps {
   nodes: Node[];
