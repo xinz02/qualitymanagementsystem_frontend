@@ -17,7 +17,7 @@ ENV NODE_OPTIONS=--max-old-space-size=4096
 ENV NEXTJS_SKIP_TYPECHECK=true
 
 # Build the app
-RUN npm run build -- --no-typecheck
+RUN npm run build --no-typecheck
 
 # Set environment for production
 ENV NODE_ENV=production
