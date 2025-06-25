@@ -5,7 +5,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <div className="card rounded-none lg:card-side bg-base-100 shadow-md mx-20 my-10 lg:h-[550px]">
         <figure className="lg:w-1/2 h-full flex items-center justify-center">
           <Image
-            src="/loginPic.jpg"
+            src="/login/loginPic.jpg"
             width={550}
             height={550}
             alt="FC picture"
