@@ -45,3 +45,5 @@ export const RichTextTab = ({
     </div>
   );
 };
+
+export default RichTextTab;

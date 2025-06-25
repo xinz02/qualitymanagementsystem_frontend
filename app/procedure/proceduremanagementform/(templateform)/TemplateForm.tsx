@@ -2,9 +2,19 @@ import { ProcedureTemplateFormData } from "@/app/interface/ProcedureTemplateForm
 import React from "react";
 import { useState, useEffect } from "react";
 import BasicInfoTab from "./(FormTabs)/basicinfotab";
-import FlowChartTab from "./(FormTabs)/flowcharttab";
-import { RichTextTab } from "./(FormTabs)/richtexttabs";
+// import FlowChartTab from "./(FormTabs)/flowcharttab";
+// import { RichTextTab } from "./(FormTabs)/richtexttabs";
 import { v4 as uuidv4 } from "uuid";
+
+import dynamic from "next/dynamic";
+
+const RichTextTab = dynamic(() => import("./(FormTabs)/richtexttabs"), {
+  ssr: false,
+});
+
+const FlowChartTab = dynamic(() => import("./(FormTabs)/flowcharttab"), {
+  ssr: false,
+});
 
 interface TemplateFormProps {
   formData: ProcedureTemplateFormData | null;

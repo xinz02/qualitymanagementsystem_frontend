@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Image, Text, StyleSheet } from "@react-pdf/renderer";
-import { Table, TH, TR, TD } from "@ag-media/react-pdf-table";
+// import { Table, TH, TR, TD } from "@ag-media/react-pdf-table";
 import { PindaanDokumenSimplified } from "@/app/interface/ProcedureTemplateFormData";
 import { User } from "@/app/interface/User";
 
