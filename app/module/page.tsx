@@ -17,6 +17,9 @@ import { Category } from "../interface/Category";
 import { triggerGlobalToast } from "../components/(common)/toast/showtoast";
 
 const ModulePage = () => {
+  const [role, setRole] = useState("STUDENT");
+  const [token, setToken] = useState("");
+
   const {
     register,
     handleSubmit,
@@ -46,11 +49,6 @@ const ModulePage = () => {
   const [categoriesToBeDelete, setCategoriesToBeDelete] = useState<string[]>(
     []
   );
-  const role = localStorage.getItem("userRole") || "STUDENT";
-  const token = localStorage.getItem("jwt") || "";
-
-  // const viewPrivilege = watch("viewPrivilege") || [];
-  // const [addCategoryList, setaddCategoryList] = useState<string[]>([]);
 
   const fetchModules = async () => {
     try {
@@ -92,8 +90,15 @@ const ModulePage = () => {
   };
 
   useEffect(() => {
-    fetchModules();
+    setToken(localStorage.getItem("jwt") || "");
+    setRole(localStorage.getItem("userRole") || "STUDENT");
   }, []);
+
+  useEffect(() => {
+    if (token) {
+      fetchModules();
+    }
+  }, [token]);
 
   useEffect(() => {
     if (selectedModule) {
