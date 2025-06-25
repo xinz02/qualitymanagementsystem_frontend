@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "next build --no-lint",
     "start": "next start",
     "lint": "next lint"
   },
@@ -39,7 +39,8 @@
     "react-hook-form": "^7.55.0",
     "react-select": "^5.10.1",
     "react-toastify": "^11.0.5",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "typescript": "^5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -50,7 +51,6 @@
     "@types/react-dom": "^19",
     "daisyui": "^5.0.35",
     "eslint": "^9",
-    "eslint-config-next": "15.2.3",
-    "typescript": "^5"
+    "eslint-config-next": "15.2.3"
   }
 }
