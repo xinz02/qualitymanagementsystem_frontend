@@ -17,47 +17,47 @@ import {
   PindaanDokumenSimplified,
   ProcedureTemplateFormData,
 } from "@/app/interface/ProcedureTemplateFormData";
-// import ProcedureHeader from "@/app/components/(pdf)/pdfheader";
-// import ProcedureFooter from "@/app/components/(pdf)/pdffooter";
-// import CoverPagePDF from "@/app/components/(pdf)/coverpage";
-// import HTMLToPDF from "@/app/components/(pdf)/htmltopdf";
-// import FlowChartExport from "@/app/components/(pdf)/flowchartexport";
-import dynamic from "next/dynamic";
+import ProcedureHeader from "@/app/components/(pdf)/pdfheader";
+import ProcedureFooter from "@/app/components/(pdf)/pdffooter";
+import CoverPagePDF from "@/app/components/(pdf)/coverpage";
+import HTMLToPDF from "@/app/components/(pdf)/htmltopdf";
+import FlowChartExport from "@/app/components/(pdf)/flowchartexport";
+// import dynamic from "next/dynamic";
 
-const FlowChartExport = dynamic(
-  () => import("@/app/components/(pdf)/flowchartexport"),
-  {
-    ssr: false,
-  }
-);
+// const FlowChartExport = dynamic(
+//   () => import("@/app/components/(pdf)/flowchartexport"),
+//   {
+//     ssr: false,
+//   }
+// );
 
-const ProcedureHeader = dynamic(
-  () => import("@/app/components/(pdf)/pdfheader"),
-  {
-    ssr: false,
-  }
-);
+// const ProcedureHeader = dynamic(
+//   () => import("@/app/components/(pdf)/pdfheader"),
+//   {
+//     ssr: false,
+//   }
+// );
 
-const ProcedureFooter = dynamic(
-  () => import("@/app/components/(pdf)/pdffooter"),
-  {
-    ssr: false,
-  }
-);
+// const ProcedureFooter = dynamic(
+//   () => import("@/app/components/(pdf)/pdffooter"),
+//   {
+//     ssr: false,
+//   }
+// );
 
-const CoverPagePDF = dynamic(
-  () => import("@/app/components/(pdf)/coverpage"),
-  {
-    ssr: false,
-  }
-);
+// const CoverPagePDF = dynamic(
+//   () => import("@/app/components/(pdf)/coverpage"),
+//   {
+//     ssr: false,
+//   }
+// );
 
-const HTMLToPDF = dynamic(
-  () => import("@/app/components/(pdf)/htmltopdf"),
-  {
-    ssr: false,
-  }
-);
+// const HTMLToPDF = dynamic(
+//   () => import("@/app/components/(pdf)/htmltopdf"),
+//   {
+//     ssr: false,
+//   }
+// );
 
 interface ProcedurePDFViewerProps {
   pindaanDokumen: PindaanDokumenSimplified[];
