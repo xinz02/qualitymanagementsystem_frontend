@@ -27,6 +27,7 @@ import { triggerGlobalToast } from "@/app/components/(common)/toast/showtoast";
 import UpdateProcedureStatusModal from "./updateprocedurestatusmodal";
 
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 
 const ProcedurePDFViewer = dynamic(
   () => import("@/app/components/(pdf)/pdfviewer"),
@@ -44,7 +45,7 @@ const DisplayProcedurePage = ({
   procedure,
   displayProcedureVersion,
 }: DisplayProcedurePageProps) => {
-  console.log("DisplayProcedurePage Props: ", displayProcedureVersion);
+  const router = useRouter();
   const role = localStorage.getItem("userRole") || "STUDENT";
   const userId = localStorage.getItem("userId") || "";
 
@@ -107,17 +108,6 @@ const DisplayProcedurePage = ({
       );
     }
   }, [procedure, displayProcedureVersion]);
-
-  console.log("displayProcedureVersion", displayProcedureVersion);
-
-  console.log(
-    "displayProcedureVersion?.pindaanDokumen?.procedureTemplateData",
-    displayProcedureVersion?.pindaanDokumen?.procedureTemplateData
-  );
-  console.log(
-    "displayProcedureVersion?.fileDownloadUrl",
-    displayProcedureVersion?.fileDownloadUrl
-  );
 
   return (
     <div className="w-full">
@@ -472,7 +462,10 @@ const DisplayProcedurePage = ({
                 className="btn bg-red-600 hover:bg-red-700 text-white gap-2 flex justify-center items-center"
                 onClick={() => {
                   if (displayProcedureVersion.procedureId) {
-                    handleDeleteProcedure(displayProcedureVersion.procedureId);
+                    handleDeleteProcedure(
+                      displayProcedureVersion.procedureId,
+                      router
+                    );
                   } else {
                     triggerGlobalToast("Procedure does not exist.", "error");
                   }

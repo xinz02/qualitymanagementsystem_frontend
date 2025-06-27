@@ -8,11 +8,13 @@ import { UseFormSetValue } from "react-hook-form";
 import { SelectOption } from "../interface/SelectOption";
 import { ProcedureFormData } from "../interface/Procedure";
 import { triggerGlobalToast } from "../components/(common)/toast/showtoast";
+import { useRouter } from "next/navigation";
 
 // const token = localStorage.getItem("jwt") || "";
 
 export async function handleDeleteProcedure(
-  procedureId: string
+  procedureId: string,
+  router: ReturnType<typeof useRouter>
   // token: string
 ) {
   if (!procedureId) return;
@@ -42,11 +44,16 @@ export async function handleDeleteProcedure(
     const response = await res.json();
 
     if (res.ok) {
-      toast.success(response.message); 
-      triggerGlobalToast(response.message || "Procedure deleted successfully!", "success");
-      window.location.href = "/procedure";
+      triggerGlobalToast(
+        response.message || "Procedure deleted successfully!",
+        "success"
+      );
+      // window.location.href = "/procedure";
+      router.push("/procedure");
     } else {
-      throw new Error(response.message || response.error || "Failed to delete procedure.");
+      throw new Error(
+        response.message || response.error || "Failed to delete procedure."
+      );
     }
   } catch (error) {
     if (error instanceof Error) {
