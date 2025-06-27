@@ -7,7 +7,11 @@ import { File, X, CornerDownLeft } from "lucide-react";
 import { ProcedureTemplateFormData } from "@/app/interface/ProcedureTemplateFormData";
 import { useForm } from "react-hook-form";
 import { ProcedureFormData } from "@/app/interface/Procedure";
-import { bytesToMB, useProcedureFormFields } from "../proceduremanagement";
+import {
+  bytesToMB,
+  handleDeleteProcedure,
+  useProcedureFormFields,
+} from "../proceduremanagement";
 import UserAsyncSelect from "@/app/components/(dropdownselect)/userselect";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -432,7 +436,6 @@ const ProcedureForm = ({ procedureID, version }: ProcedureFormProps) => {
                   <UserAsyncSelect
                     isMulti
                     {...register("pindaanDokumen.assignedTo")}
-                    label="Assign To:"
                     value={selectedUsers}
                     onChange={handleSelectUser}
                   />
@@ -572,7 +575,18 @@ const ProcedureForm = ({ procedureID, version }: ProcedureFormProps) => {
                 <button
                   type="button"
                   onClick={() => {
-                    handleDeleteProcedureVersion(procedureID, version);
+                    if (!procedureID) {
+                      triggerGlobalToast(
+                        "No procedureID passed. Please try again later."
+                      );
+                      return;
+                    }
+
+                    if (version) {
+                      handleDeleteProcedureVersion(procedureID, version);
+                    } else {
+                      handleDeleteProcedure(procedureID, router);
+                    }
                   }}
                   className="btn bg-red-600 hover:bg-red-700 text-white border-0"
                 >
