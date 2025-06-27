@@ -197,10 +197,22 @@ const EvidenceUploadRow = ({
         <fieldset className="flex flex-col justify-center gap-2">
           <input
             type="text"
+            placeholder="2425/2"
             {...register("evidenceInfoData.semester", {
               required: "Semester is required.",
             })}
             className="border border-gray-500 bg-white rounded-lg px-3 py-1 text-base w-auto flex-1"
+            onChange={(e) => {
+              let value = e.target.value.replace(/[^\d]/g, ""); // Remove non-digits
+              if (value.length > 5) value = value.slice(0, 5); // Limit max digits
+
+              // Insert '/' after 4 digits
+              if (value.length > 4) {
+                value = value.slice(0, 4) + "/" + value.slice(4);
+              }
+              e.target.value = value; // Update input value
+              console.log(e.target.value);
+            }}
           />
         </fieldset>
         {errors.evidenceInfoData?.semester && (
