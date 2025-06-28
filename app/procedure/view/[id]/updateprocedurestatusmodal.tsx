@@ -9,10 +9,12 @@ import { useForm } from "react-hook-form";
 
 interface UpdateProcedureStatusModalProps {
   procedure: ProcedureVersion;
+  refetchProcedure: () => void;
 }
 
 const UpdateProcedureStatusModal = ({
   procedure,
+  refetchProcedure,
 }: UpdateProcedureStatusModalProps) => {
   const userId = localStorage.getItem("userId") || "";
 
@@ -32,7 +34,6 @@ const UpdateProcedureStatusModal = ({
 
   useEffect(() => {
     if (procedure) {
-      
       reset({
         status: procedure?.pindaanDokumen?.approveStatus || "PENDING",
         description: procedure?.pindaanDokumen?.description || "",
@@ -48,7 +49,6 @@ const UpdateProcedureStatusModal = ({
 
     try {
       const token = localStorage.getItem("jwt") || "";
-
 
       // if (data.status === "APPROVE") {
       //   setValue("description", "");
@@ -81,6 +81,7 @@ const UpdateProcedureStatusModal = ({
             "update_procedure_status_modal"
           ) as HTMLDialogElement
         )?.close();
+        refetchProcedure();
         triggerGlobalToast(
           response.message ||
             "Procedure status updated successfully. Please refresh to view.",

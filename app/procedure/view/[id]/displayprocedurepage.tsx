@@ -39,11 +39,13 @@ const ProcedurePDFViewer = dynamic(
 interface DisplayProcedurePageProps {
   procedure: Procedure | null;
   displayProcedureVersion?: ProcedureVersion | null;
+  refetchProcedure: () => void; 
 }
 
 const DisplayProcedurePage = ({
   procedure,
   displayProcedureVersion,
+  refetchProcedure
 }: DisplayProcedurePageProps) => {
   const router = useRouter();
   const role = localStorage.getItem("userRole") || "STUDENT";
@@ -495,7 +497,7 @@ const DisplayProcedurePage = ({
       )}
 
       {displayProcedureVersion && (
-        <UpdateProcedureStatusModal procedure={displayProcedureVersion} />
+        <UpdateProcedureStatusModal procedure={displayProcedureVersion} refetchProcedure={() => refetchProcedure()} />
       )}
     </div>
   );
