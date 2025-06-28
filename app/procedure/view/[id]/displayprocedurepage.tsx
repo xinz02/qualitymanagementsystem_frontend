@@ -466,23 +466,25 @@ const DisplayProcedurePage = ({
                 </button>
               )}
 
-              <button
-                type="button"
-                className="btn bg-red-600 hover:bg-red-700 text-white gap-2 flex justify-center items-center"
-                onClick={() => {
-                  if (displayProcedureVersion.procedureId) {
-                    handleDeleteProcedure(
-                      displayProcedureVersion.procedureId,
-                      router
-                    );
-                  } else {
-                    triggerGlobalToast("Procedure does not exist.", "error");
-                  }
-                }}
-              >
-                <Trash2 className="h-5 w-5" />
-                Delete
-              </button>
+              {(role === "ADMIN" || role === "SPK_MANAGER") && (
+                <button
+                  type="button"
+                  className="btn bg-red-600 hover:bg-red-700 text-white gap-2 flex justify-center items-center"
+                  onClick={() => {
+                    if (displayProcedureVersion.procedureId) {
+                      handleDeleteProcedure(
+                        displayProcedureVersion.procedureId,
+                        router
+                      );
+                    } else {
+                      triggerGlobalToast("Procedure does not exist.", "error");
+                    }
+                  }}
+                >
+                  <Trash2 className="h-5 w-5" />
+                  Delete
+                </button>
+              )}
             </>
           )}
         </div>

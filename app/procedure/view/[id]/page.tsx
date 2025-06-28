@@ -516,6 +516,9 @@ const ProcedureViewPage = () => {
     setUserId(localStorage.getItem("userId"));
   }, []);
 
+  console.log("Role: ", role);
+  console.log("User ID: ", userId);
+
   return (
     <>
       <div className="flex flex-col items-center justify-center p-12 w-full">
@@ -528,15 +531,16 @@ const ProcedureViewPage = () => {
           <div className="text-4xl font-extrabold mb-5 grow text-center mx-5">
             {procedure?.procedureName}
           </div>
+
           {procedure?.pindaanDokumen &&
             (role === "ADMIN" ||
               role === "SPK_MANAGER" ||
               (userId &&
-                procedure.pindaanDokumen.map((procedure) => {
-                  if (procedure.assignTo) {
-                    procedure.assignTo.some((user) => user.userId === userId);
-                  }
-                }))) && (
+                procedure.pindaanDokumen.some(
+                  (version) =>
+                    version.assignTo &&
+                    version.assignTo.some((user) => user.userId === userId)
+                ))) && (
               <div className="">
                 {/* Version History Button */}
                 <button

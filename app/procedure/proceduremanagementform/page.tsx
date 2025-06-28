@@ -25,7 +25,7 @@ interface ProcedureFormProps {
 }
 
 const ProcedureForm = ({ procedureID, version }: ProcedureFormProps) => {
-  // const [role, setRole] = useState("STUDENT");
+  const [role, setRole] = useState("STUDENT");
   const [token, setToken] = useState("");
   // const [userId, setUserId] = useState("");
   // const [selectedApprover, setSelectedApprover] = useState<SelectOption | null>(
@@ -65,11 +65,11 @@ const ProcedureForm = ({ procedureID, version }: ProcedureFormProps) => {
   const fileSize = watch("fileSize");
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      // setRole(localStorage.getItem("userRole") || "STUDENT");
+    
+      setRole(localStorage.getItem("userRole") || "STUDENT");
       setToken(localStorage.getItem("jwt") || "");
       // setUserId(localStorage.getItem("userId") || "");
-    }
+  
   }, []);
 
   useEffect(() => {
@@ -571,7 +571,7 @@ const ProcedureForm = ({ procedureID, version }: ProcedureFormProps) => {
               >
                 Save
               </button>
-              {procedureID && (
+              {(role === "ADMIN" || role === "SPK_MANAGER") && procedureID && (
                 <button
                   type="button"
                   onClick={() => {
