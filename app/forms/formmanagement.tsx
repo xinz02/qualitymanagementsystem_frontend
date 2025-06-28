@@ -1,8 +1,8 @@
 import { useRouter } from "next/navigation";
 import { triggerGlobalToast } from "../components/(common)/toast/showtoast";
 
-export async function handleDeleteForm(formId: string) {
-  const router = useRouter();
+export async function handleDeleteForm(formId: string,   router: ReturnType<typeof useRouter>
+  ) {
 
   if (!formId) return;
 

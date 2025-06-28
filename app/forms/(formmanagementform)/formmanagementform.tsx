@@ -438,7 +438,6 @@ const FormManagementForm = ({ formID }: FormsFormProps) => {
                 {...register("personInChargeId", {
                   required: "Person In Charge is required.",
                 })}
-               
                 value={selectedPersonInCharge}
                 onChange={handleSelectPersonInCharge}
               />
@@ -543,7 +542,7 @@ const FormManagementForm = ({ formID }: FormsFormProps) => {
                 <button
                   type="button"
                   onClick={() => {
-                    handleDeleteForm(formID);
+                    handleDeleteForm(formID, router);
                   }}
                   className="btn bg-red-600 hover:bg-red-700 text-white border-0"
                 >
