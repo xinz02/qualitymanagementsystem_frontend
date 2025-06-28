@@ -20,7 +20,7 @@ import { handleDeleteForm } from "../../formmanagement";
 
 const FormViewPage = () => {
   const id = useParams().id as string;
-  console.log("ID in view: ", id);
+  const router = useRouter();
 
   const [form, setForm] = useState<FormInfo>();
   const [token, setToken] = useState("");
@@ -174,7 +174,7 @@ const FormViewPage = () => {
               className="btn bg-red-600 hover:bg-red-700 text-white gap-2 flex justify-center items-center"
               onClick={() => {
                 if (form.formId) {
-                  handleDeleteForm(form.formId, useRouter());
+                  handleDeleteForm(form.formId, router);
                 } else {
                   triggerGlobalToast("Procedure does not exist.", "error");
                 }
