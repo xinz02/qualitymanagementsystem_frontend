@@ -39,19 +39,21 @@ const ProcedurePDFViewer = dynamic(
 interface DisplayProcedurePageProps {
   procedure: Procedure | null;
   displayProcedureVersion?: ProcedureVersion | null;
-  refetchProcedure: () => void; 
+  refetchProcedure: () => void;
 }
 
 const DisplayProcedurePage = ({
   procedure,
   displayProcedureVersion,
-  refetchProcedure
+  refetchProcedure,
 }: DisplayProcedurePageProps) => {
   const router = useRouter();
-  const role = localStorage.getItem("userRole") || "STUDENT";
-  const userId = localStorage.getItem("userId") || "";
+  // const role = localStorage.getItem("userRole") || "STUDENT";
+  // const userId = localStorage.getItem("userId") || "";
 
   const [isLoading, setIsLoading] = useState(true);
+  const [role, setRole] = useState<string>("");
+  const [userId, setUserId] = useState<string>("");
   const [evidenceFiles, setEvidenceFiles] =
     useState<FlowChartsEvidenceFileData | null>(null);
   const [flowCharts, setFlowCharts] = useState<FlowChart>();
@@ -91,6 +93,11 @@ const DisplayProcedurePage = ({
       setIsLoading(false);
     }, 1000); // Simulate loading delay
   }, [displayProcedureVersion]);
+
+  useEffect(() => {
+    setRole(localStorage.getItem("userRole") || "STUDENT");
+    setUserId(localStorage.getItem("userId") || "");
+  }, []);
 
   useEffect(() => {
     if (
@@ -497,7 +504,10 @@ const DisplayProcedurePage = ({
       )}
 
       {displayProcedureVersion && (
-        <UpdateProcedureStatusModal procedure={displayProcedureVersion} refetchProcedure={() => refetchProcedure()} />
+        <UpdateProcedureStatusModal
+          procedure={displayProcedureVersion}
+          refetchProcedure={() => refetchProcedure()}
+        />
       )}
     </div>
   );
