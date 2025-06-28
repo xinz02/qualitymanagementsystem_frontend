@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { FormInfo } from "@/app/interface/FormInterface";
 import { triggerGlobalToast } from "@/app/components/(common)/toast/showtoast";
@@ -89,7 +89,7 @@ const FormViewPage = () => {
         </button>
 
         <div className="text-4xl font-extrabold mb-5 grow text-center mx-5">
-          {form?.fileName}
+          {form?.formName}
         </div>
       </div>
 
@@ -174,7 +174,7 @@ const FormViewPage = () => {
               className="btn bg-red-600 hover:bg-red-700 text-white gap-2 flex justify-center items-center"
               onClick={() => {
                 if (form.formId) {
-                  handleDeleteForm(form.formId);
+                  handleDeleteForm(form.formId, useRouter());
                 } else {
                   triggerGlobalToast("Procedure does not exist.", "error");
                 }
