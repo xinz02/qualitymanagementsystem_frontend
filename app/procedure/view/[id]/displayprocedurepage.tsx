@@ -13,6 +13,7 @@ import {
   FileX,
   SquarePen,
   Trash2,
+  User2Icon,
 } from "lucide-react";
 import Link from "next/link";
 import React, { useEffect, useMemo, useState } from "react";
@@ -225,7 +226,14 @@ const DisplayProcedurePage = ({
                       />
                       {/* </div> */}
                     </div>
-                    {(role === "ADMIN" || role === "SPK_MANAGER") &&
+                    {(role === "ADMIN" ||
+                      role === "SPK_MANAGER" ||
+                      (userId &&
+                        displayProcedureVersion.pindaanDokumen.assignTo.length >
+                          0 &&
+                        displayProcedureVersion.pindaanDokumen.assignTo.some(
+                          (user) => user.userId === userId
+                        ))) &&
                       displayProcedureVersion.pindaanDokumen && (
                         // ||
                         // (userId !== "" &&
