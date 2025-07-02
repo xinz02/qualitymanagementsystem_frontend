@@ -328,7 +328,7 @@ const ProceduresPageDisplay = () => {
               </label>
             </div>
 
-            {role === "ADMIN" || role === "SPK_MANAGER" && (
+            {(role === "ADMIN" || role === "SPK_MANAGER") && (
               <div>
                 <button
                   className="btn px-4 bg-[#C67A83] text-white text-sm border-0 hover:bg-[#b96670]"
