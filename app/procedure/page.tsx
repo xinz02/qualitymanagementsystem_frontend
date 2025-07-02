@@ -64,7 +64,7 @@ const ProceduresPageDisplay = () => {
       );
 
       if (!res.ok) {
-        const errorData = await res.json(); // Parse the backend's JSON error
+        const errorData = await res.json();
         console.log(errorData);
         throw new Error(errorData.error || "Failed to fetch procedures");
       }
@@ -215,6 +215,8 @@ const ProceduresPageDisplay = () => {
     assignedProcedures,
   ]);
 
+  console.log("Role: ", role);
+
   return (
     <div>
       {isLoading ? (
@@ -326,7 +328,7 @@ const ProceduresPageDisplay = () => {
               </label>
             </div>
 
-            {role === "ADMIN" && (
+            {role === "ADMIN" || role === "SPK_MANAGER" && (
               <div>
                 <button
                   className="btn px-4 bg-[#C67A83] text-white text-sm border-0 hover:bg-[#b96670]"
@@ -349,7 +351,6 @@ const ProceduresPageDisplay = () => {
               <div role="tablist" className="tabs tabs-border mt-5">
                 <button
                   role="tab"
-                  
                   className={`tab ${
                     activeTab === "accessible" ? "tab-active" : ""
                   }`}
