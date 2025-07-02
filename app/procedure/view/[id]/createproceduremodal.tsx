@@ -66,12 +66,22 @@ const CreateProcedureModal = () => {
         "error"
       );
       return;
+    } else if (!data.procedureFile && !data.pindaanDokumen) {
+      triggerGlobalToast(
+        "Must select either create new procedure or upload file.",
+        "error"
+      );
+      return;
     }
 
     try {
       const formData = new FormData();
       if (data.procedureFile) {
-        formData.append("file", data.procedureFile);
+        const fileList = data.procedureFile as any;
+        const file = fileList[0] as File;
+        formData.append("file", file);
+
+        // formData.append("file", data.procedureFile);
       } else {
         const pindaanDokumenData = JSON.stringify({
           versi: data.pindaanDokumen.versi,
@@ -289,10 +299,13 @@ const CreateProcedureModal = () => {
                           type="file"
                           accept=".pdf, .doc, .docx"
                           className="file-input mx-2 file:bg-[#e5e5e5]"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            setValue("procedureFile", file); // <- set a File directly
-                          }}
+                          // onChange={(e) => {
+                          //   const file = e.target.files?.[0];
+                          //   setValue("procedureFile", file); // <- set a File directly
+                          // }}
+                          {...register("procedureFile", {
+                            required: "File is required.",
+                          })}
                         />
 
                         {errors.procedureFile && (
