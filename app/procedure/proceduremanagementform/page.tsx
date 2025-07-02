@@ -65,11 +65,9 @@ const ProcedureForm = ({ procedureID, version }: ProcedureFormProps) => {
   const fileSize = watch("fileSize");
 
   useEffect(() => {
-    
-      setRole(localStorage.getItem("userRole") || "STUDENT");
-      setToken(localStorage.getItem("jwt") || "");
-      // setUserId(localStorage.getItem("userId") || "");
-  
+    setRole(localStorage.getItem("userRole") || "STUDENT");
+    setToken(localStorage.getItem("jwt") || "");
+    // setUserId(localStorage.getItem("userId") || "");
   }, []);
 
   useEffect(() => {
@@ -234,6 +232,11 @@ const ProcedureForm = ({ procedureID, version }: ProcedureFormProps) => {
         "Only allow either create new procedure or upload file.",
         "error"
       );
+      return;
+    }
+
+    if (!data.procedureFile && !watch("pindaanDokumen")) {
+      triggerGlobalToast("File is required. Please upload a file.", "error");
       return;
     }
 
