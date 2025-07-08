@@ -1,4 +1,3 @@
-import { toast } from "react-toastify";
 import {
   EvidenceFileData,
   FlowChartsEvidenceFileData,
@@ -10,12 +9,9 @@ import { ProcedureFormData } from "../interface/Procedure";
 import { triggerGlobalToast } from "../components/(common)/toast/showtoast";
 import { useRouter } from "next/navigation";
 
-// const token = localStorage.getItem("jwt") || "";
-
 export async function handleDeleteProcedure(
   procedureId: string,
   router: ReturnType<typeof useRouter>
-  // token: string
 ) {
   if (!procedureId) return;
 
@@ -48,7 +44,7 @@ export async function handleDeleteProcedure(
         response.message || "Procedure deleted successfully!",
         "success"
       );
-      // window.location.href = "/procedure";
+
       router.push("/procedure");
     } else {
       throw new Error(
@@ -70,42 +66,6 @@ export async function handleDeleteProcedure(
 export function bytesToMB(bytes: number): string {
   return (bytes / (1024 * 1024)).toFixed(2) + " MB";
 }
-
-// export const fetchEvidenceFile = async (nodeId: string) => {
-//   console.log("fetching");
-//   try {
-//     const jwtToken = localStorage.getItem("jwt") || "";
-
-//     const res = await fetch(
-//       `${process.env.NEXT_PUBLIC_API_URL}/procedure/evidenceFiles/node/${nodeId}`,
-//       {
-//         method: "GET",
-//         headers: {
-//           "Content-Type": "application/json",
-//           Authorization: `Bearer ${jwtToken}`,
-//         },
-//       }
-//     );
-
-//     if (!res.ok) {
-//       throw new Error("Failed to fetch evidence files.");
-//     }
-
-//     const result = await res.json();
-//     const data: EvidenceFileData[] = result.data.evidenceFileListVOList;
-//     console.log("Data", data);
-
-//     setEvidenceFiles(data);
-//   } catch (err) {
-//     setEvidenceFiles([]);
-//     if (err instanceof Error) {
-//       toast.error(err.message);
-//     } else {
-//       toast.error("An unknown error occurred");
-//     }
-//     console.log("Error occurs. Please try again later");
-//   }
-// };
 
 export const fetchEvidenceFilesByNode = async (
   nodeId: string
@@ -211,21 +171,29 @@ export function useProcedureFormFields(
     }
   };
 
-  const handleSelectUser = (newValue: unknown) => {
-    const selectedOptions = newValue as SelectOption[];
-    setSelectedUsers(selectedOptions || []);
+  // const handleSelectUser = (newValue: unknown) => {
+  //   const selectedOptions = newValue as SelectOption[];
+  //   setSelectedUsers(selectedOptions || []);
 
-    if (selectedOptions.length > 0) {
-      const userIds = selectedOptions.map((user) => user.value);
-      setValue("pindaanDokumen.assignedTo", userIds);
-      // setFormData({
-      //   ...formData,
-      //   pindaanDokumen: {
-      //     ...formData.pindaanDokumen,
-      //     assignedTo: userIds,
-      //   },
-      // });
-    }
+  //   if (selectedOptions.length > 0) {
+  //     const userIds = selectedOptions.map((user) => user.value);
+  //     setValue("pindaanDokumen.assignedTo", userIds);
+  //   }
+  // };
+
+  const handleSelectUser = (newValue: unknown) => {
+    const selectedOptions = (newValue as SelectOption[]) || [];
+    setSelectedUsers(selectedOptions);
+
+    const userIds = selectedOptions.map((user) => user.value);
+    setValue(
+      "pindaanDokumen.assignedTo",
+      userIds
+      // {
+      //   shouldValidate: true,
+      //   shouldDirty: true,
+      // }
+    );
   };
 
   return {

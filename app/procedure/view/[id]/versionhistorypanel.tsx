@@ -1,4 +1,3 @@
-// components/VersionHistoryPanel.jsx
 import React, { useEffect, useState } from "react";
 import { History, Clock, UserPen, Eye, X, Plus } from "lucide-react";
 import { PindaanDokumenVO } from "@/app/interface/ProcedureTemplateFormData";
@@ -29,20 +28,8 @@ const VersionHistoryPanel = ({
   const role = localStorage.getItem("userRole") || "";
 
   const [modalVersion, setModalVersion] = useState<number>(1); // default version
-  // const [selectedVersionNumber, setSelectedVersionNumber] = useState<number | null>(null);
-
-  // const [modalAssignTos, setModalAssignTos] = useState<string[]>([]);
   const [modalAssignTos, setModalAssignTos] = useState<User[]>([]);
 
-  //   const formatDate = (dateString: any) => {
-  //     return new Date(dateString).toLocaleDateString('en-US', {
-  //       year: 'numeric',
-  //       month: 'short',
-  //       day: 'numeric',
-  //       hour: '2-digit',
-  //       minute: '2-digit'
-  //     });
-  //   };
   const formatDate = (dateString: string) => {
     if (dateString === null || dateString === undefined || dateString === "") {
       return "N/A";
@@ -75,14 +62,7 @@ const VersionHistoryPanel = ({
 
     const nextVersion = Number(latestVersionWithStatus.versi) + 1;
 
-    // const userIds: string[] =
-    //   latestVersionWithStatus.assignTo
-    //     ?.map((user) => user.userId)
-    //     .filter((id): id is string => id !== undefined) ?? [];
-    // latestVersionWithStatus.assignTo?.map((user) => user.userId) ?? [];
-
     setModalVersion(nextVersion);
-    // setModalAssignTos(userIds); // or pre-fill with data if needed
     setModalAssignTos(latestVersionWithStatus.assignTo ?? []);
 
     (
@@ -190,7 +170,6 @@ const VersionHistoryPanel = ({
 
                         <div className="flex items-center gap-2 text-sm text-base-content/70 mb-1">
                           <Clock className="h-3 w-3" />
-                          {/* <span>{formatDate(version.tarikh)}</span> */}
                           <span>{formatDate(version.tarikh)}</span>
                         </div>
 

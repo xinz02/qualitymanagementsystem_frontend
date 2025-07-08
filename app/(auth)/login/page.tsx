@@ -96,13 +96,15 @@ const LoginPage = () => {
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={pending}
-            className="btn bg-[#464646] text-white font-thin text-sm rounded-xl px-6 h-9"
-          >
-            LOGIN
-          </button>
+          <div className="flex justify-center">
+            <button
+              type="submit"
+              disabled={pending}
+              className="btn bg-[#464646] text-white font-thin text-sm rounded-xl px-6 h-9"
+            >
+              LOGIN
+            </button>
+          </div>
         </form>
       </div>
     </div>

@@ -454,7 +454,10 @@ const FormManagementForm = ({ formID }: FormsFormProps) => {
               </legend>
 
               <ProcedureSelect
-                {...register("procedureId")}
+                {...(register("procedureId"),
+                {
+                  required: "File is required.",
+                })}
                 value={selectedProcedure}
                 onChange={handleSelectProcedure}
               />

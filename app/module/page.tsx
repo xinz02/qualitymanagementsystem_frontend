@@ -52,9 +52,6 @@ const ModulePage = () => {
 
   const fetchModules = async () => {
     try {
-      console.log("token" + localStorage.getItem("jwt"));
-      console.log("role" + localStorage.getItem("userRole"));
-
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/module/getAllAccessibleModule`,
         {
@@ -113,7 +110,7 @@ const ModulePage = () => {
 
   const handleAddCategory = () => {
     if (newCategory.trim() !== "") {
-      // Check if category already exists (case insensitive comparison)
+      // Check if category already exists 
       const categoryExists = categories.some(
         (cat) =>
           cat.categoryName.toLowerCase() === newCategory.trim().toLowerCase()

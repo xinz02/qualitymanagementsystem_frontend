@@ -3,7 +3,6 @@ import {
   ProcedureApproveStatus,
   ProcedureVersion,
 } from "@/app/interface/Procedure";
-import { version } from "os";
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
@@ -25,12 +24,7 @@ const UpdateProcedureStatusModal = ({
     reset,
     watch,
     formState: { errors },
-  } = useForm<ProcedureApproveStatus>({
-    // defaultValues: {
-    //   status: procedure?.pindaanDokumen?.approveStatus || "PENDING",
-    //   description: procedure?.pindaanDokumen?.description || "",
-    // },
-  });
+  } = useForm<ProcedureApproveStatus>({});
 
   useEffect(() => {
     if (procedure) {
@@ -49,10 +43,6 @@ const UpdateProcedureStatusModal = ({
 
     try {
       const token = localStorage.getItem("jwt") || "";
-
-      // if (data.status === "APPROVE") {
-      //   setValue("description", "");
-      // }
 
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/procedure/updateProcedureStatus/${procedure?.procedureId}`,
@@ -75,7 +65,6 @@ const UpdateProcedureStatusModal = ({
 
       if (res.ok) {
         reset();
-        // getProcedureById(procedure?.procedureId);
         (
           document.getElementById(
             "update_procedure_status_modal"
@@ -118,20 +107,6 @@ const UpdateProcedureStatusModal = ({
                   <legend className="text-base font-semibold px-1">
                     Approve Status: {watch("status")}
                   </legend>
-                  {/* <select
-                    className="select select-bordered w-full"
-                    // value={watch("status") || "PENDING"}
-                    {...register("status", {
-                      required: "Approve status is required.",
-                    })}
-                  >
-                    <option value="PENDING" disabled>
-                      PENDING
-                    </option>
-                    <option value="APPROVE">APPROVE</option>
-
-                    <option value="REJECT">REJECT</option>
-                  </select> */}
                   <select
                     className="select select-bordered w-full"
                     {...register("status", {

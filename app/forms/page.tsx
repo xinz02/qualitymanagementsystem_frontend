@@ -80,7 +80,6 @@ const FormPageDisplay = () => {
 
   useEffect(() => {
     const jwtToken = localStorage.getItem("jwt") || "";
-   
 
     if (jwtToken !== "") {
       const userRole = localStorage.getItem("userRole") || "";
@@ -203,7 +202,7 @@ const FormPageDisplay = () => {
               </label>
             </div>
 
-            {role === "ADMIN" && (
+            {(role === "ADMIN" || role === "SPK_MANAGER") && (
               <div>
                 <button className="btn px-4 bg-[#C67A83] text-white text-sm border-0 hover:bg-[#b96670]">
                   <Link

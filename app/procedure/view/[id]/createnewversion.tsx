@@ -32,38 +32,13 @@ const CreateNewVersionModal = ({
   const { selectedUsers, handleSelectUser, setSelectedUsers } =
     useProcedureFormFields(setValue);
 
-  //   useEffect(() => {
-  //     setValue("pindaanDokumen.versi", latestversion.toString());
-
-  //     // 👇 This is new: auto set selectedUsers when assignTos changes
-  //     if (assignTos && assignTos.length > 0) {
-  //       const userOptions = assignTos.map((id) => ({
-  //         value: id,
-  //         label: "", // you can fetch and map names if needed
-  //       }));
-  //       setSelectedUsers(userOptions);
-  //       setValue("pindaanDokumen.assignedTo", assignTos);
-  //     }
-  //   }, [latestversion, assignTos, setValue, setSelectedUsers]);
-
   useEffect(() => {
     setValue("pindaanDokumen.versi", latestversion.toString());
 
-    // if (assignTos && assignTos.length > 0) {
-    //   const userOptions = assignTos.map((user) => ({
-    //     value: user.userId,
-    //     label: user.name,
-    //   }));
-    //   setSelectedUsers(userOptions);
-    //   setValue(
-    //     "pindaanDokumen.assignedTo",
-    //     userOptions.map((u) => u.value)
-    //   );
-    // }
     if (assignTos && assignTos.length > 0) {
       const userOptions = assignTos
         .filter(
-          (user): user is typeof user & { userId: string } => !!user.userId
+          (user): user is typeof user & { userId: string } => !!user.userId // check if userId exists
         )
         .map((user) => ({
           value: user.userId,
@@ -111,6 +86,11 @@ const CreateNewVersionModal = ({
     //   );
     // }
 
+    console.log(
+      "data.pindaanDokumen.assignedTo: ",
+      data.pindaanDokumen.assignedTo
+    );
+
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/procedure/addNewVersion/${procedureId}`,
@@ -151,6 +131,10 @@ const CreateNewVersionModal = ({
       }
     }
   };
+
+  useEffect(() => {
+    console.log("Selected User: ", selectedUsers);
+  }, [selectedUsers]);
 
   return (
     <UserProvider>

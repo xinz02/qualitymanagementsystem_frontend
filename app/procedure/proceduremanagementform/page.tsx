@@ -2,7 +2,6 @@
 
 import React from "react";
 import { useState, useEffect } from "react";
-import { SelectOption } from "@/app/interface/SelectOption";
 import { File, X, CornerDownLeft } from "lucide-react";
 import { ProcedureTemplateFormData } from "@/app/interface/ProcedureTemplateFormData";
 import { useForm } from "react-hook-form";
@@ -21,16 +20,12 @@ import ProcedureInfoForm from "./procedureinfoform";
 
 interface ProcedureFormProps {
   procedureID: string;
-  version: string;
+  version?: string;
 }
 
 const ProcedureForm = ({ procedureID, version }: ProcedureFormProps) => {
   const [role, setRole] = useState("STUDENT");
   const [token, setToken] = useState("");
-  // const [userId, setUserId] = useState("");
-  // const [selectedApprover, setSelectedApprover] = useState<SelectOption | null>(
-  //   null
-  // );
   const [approveStatus, setApproveStatus] = useState<string>("PENDING");
   const [templateFormData, setTemplateFormData] =
     useState<ProcedureTemplateFormData | null>(null);
@@ -67,11 +62,10 @@ const ProcedureForm = ({ procedureID, version }: ProcedureFormProps) => {
   useEffect(() => {
     setRole(localStorage.getItem("userRole") || "STUDENT");
     setToken(localStorage.getItem("jwt") || "");
-    // setUserId(localStorage.getItem("userId") || "");
   }, []);
 
   useEffect(() => {
-    if (procedureID && version) {
+    if (procedureID) {
       getProcedureById(procedureID, version);
     }
   }, [procedureID]);
@@ -153,10 +147,17 @@ const ProcedureForm = ({ procedureID, version }: ProcedureFormProps) => {
           "pindaanDokumen.assignedTo",
           userOptions.map((u: any) => u.value)
         );
-        // setValue(
-        //   "pindaanDokumen.assignedTo",
-        //   userOptions.map((u: any) => u.value)
-        // );
+        console.log(
+          "setValue pindaanDokumen.assignedTo:",
+          userOptions.map((u: any) => u.value)
+        );
+        console.log(
+          "get pindaanDokumen.assignedTo:",
+          procedureData.pindaanDokumen.assignedTo
+        );
+        console.log("watch assignedTo:", watch("pindaanDokumen.assignedTo"));
+        console.log("get selectedUser:", selectedUsers);
+        console.log("get userOptions:", userOptions);
       }
 
       if (
@@ -289,6 +290,11 @@ const ProcedureForm = ({ procedureID, version }: ProcedureFormProps) => {
             // ),
           });
 
+          console.log(
+            "data.pindaanDokumen.assignedTo: ",
+            data.pindaanDokumen.assignedTo
+          );
+
           formData.append("pindaanDokumen", pindaanDokumenData);
         }
       }
@@ -323,7 +329,6 @@ const ProcedureForm = ({ procedureID, version }: ProcedureFormProps) => {
       );
 
       const response = await res.json();
-      console.log("Response: ", response);
 
       if (res.ok) {
         triggerGlobalToast(
@@ -397,6 +402,14 @@ const ProcedureForm = ({ procedureID, version }: ProcedureFormProps) => {
     }
   };
 
+  // useEffect(() => {
+  //   console.log("Selectd user: ", selectedUsers);
+  // }, [selectedUsers]);
+
+  // useEffect(() => {
+  //   console.log("pindaan: ", watch("pindaanDokumen.assignedTo"));
+  // }, []);
+
   return (
     <div className="flex flex-col items-center justify-center mx-20 my-10">
       <div className="w-full flex items-center">
@@ -427,17 +440,19 @@ const ProcedureForm = ({ procedureID, version }: ProcedureFormProps) => {
               handleCategoryChange={handleCategoryChange}
               categoryOptions={categoryOptions}
             />
-            {/* {watch("pindaanDokumen.assignedTo") && <div>Assignnnnnnn!!</div>}
-            {watch("pindaanDokumen.assignTo") && <div>Assignnnnnnn!23</div>} */}
+
             {watch("pindaanDokumen") && (
               <>
                 <fieldset className="flex items-center gap-2 py-3">
                   <legend className="fieldset-legend text-base font-semibold float-left w-auto px-1">
-                    Assign To:
+                    Assign To:{" "}
                   </legend>
 
                   <UserAsyncSelect
                     isMulti
+                    // {...register("pindaanDokumen.assignedTo", {
+                    //   required: "Must assign at least one user.",
+                    // })}
                     {...register("pindaanDokumen.assignedTo")}
                     value={selectedUsers}
                     onChange={handleSelectUser}
@@ -468,15 +483,7 @@ const ProcedureForm = ({ procedureID, version }: ProcedureFormProps) => {
                 {approveStatus !== "APPROVE" && (
                   <div className="w-full flex items-center gap-2 pt-2 pb-4">
                     <span className="font-semibold">Reject Description: </span>
-                    <div
-                    // className={`flex justify-center w-[100px] border-1 p-2 ${
-                    //   approveStatus === "REJECT"
-                    //     ? "bg-red-500"
-                    //     : approveStatus === "APPROVE"
-                    //     ? "bg-green-500"
-                    //     : "bg-yellow-400"
-                    // }`}
-                    >
+                    <div>
                       {watch("pindaanDokumen.description") ||
                         "No description provided."}
                     </div>
@@ -487,24 +494,24 @@ const ProcedureForm = ({ procedureID, version }: ProcedureFormProps) => {
 
             <div>
               {/* upload file */}
-              {!watch("pindaanDokumen") && (
+              {!watch("pindaanDokumen") && !fileDownloadUrl && (
                 <div>
                   <fieldset className="flex items-center gap-2 py-3">
                     <legend className="fieldset-legend text-base font-semibold float-left w-auto px-1">
                       Upload Procedure:
                     </legend>
 
-                    {!fileDownloadUrl && (
-                      <input
-                        type="file"
-                        accept=".pdf, .doc, .docx"
-                        className="file-input mx-2 file:bg-[#e5e5e5]"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          setValue("procedureFile", file); // <- set a File directly
-                        }}
-                      />
-                    )}
+                    {/* {!fileDownloadUrl && ( */}
+                    <input
+                      type="file"
+                      accept=".pdf, .doc, .docx"
+                      className="file-input mx-2 file:bg-[#e5e5e5]"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        setValue("procedureFile", file); // <- set a File directly
+                      }}
+                    />
+                    {/* )} */}
 
                     {errors.procedureFile && (
                       <span className="text-red-500 text-sm">
@@ -585,7 +592,9 @@ const ProcedureForm = ({ procedureID, version }: ProcedureFormProps) => {
                       return;
                     }
 
-                    if (version) {
+                    // && parseInt(version) > 1
+
+                    if (version && parseInt(version) > 1) {
                       handleDeleteProcedureVersion(procedureID, version);
                     } else {
                       handleDeleteProcedure(procedureID, router);

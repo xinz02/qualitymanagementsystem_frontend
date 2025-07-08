@@ -16,7 +16,6 @@ import { triggerGlobalToast } from "../components/(common)/toast/showtoast";
 
 const ProceduresPageDisplay = () => {
   const { allModules } = useModuleContext();
-  // const { jwtToken, isAuthReady } = useAuth();
 
   const [role, setRole] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -87,12 +86,6 @@ const ProceduresPageDisplay = () => {
       setIsLoading(false);
     }
   };
-
-  // useEffect(() => {
-  //   if (isAuthReady) {
-  //     fetchProcedures();
-  //   }
-  // }, [isAuthReady]);
 
   useEffect(() => {
     fetchProcedures();
@@ -225,6 +218,7 @@ const ProceduresPageDisplay = () => {
         <div className="flex flex-col items-center justify-center py-12 px-10 w-full">
           <div className="text-4xl font-extrabold mb-5">Procedures</div>
 
+          {/* items per page */}
           <div className="w-9/10 flex justify-between items-center gap-5">
             <div className="flex items-center gap-5 flex-grow">
               <div className="flex items-center gap-2">
@@ -246,6 +240,7 @@ const ProceduresPageDisplay = () => {
                 </select>
               </div>
 
+              {/* module filter */}
               <div className="flex items-center gap-2">
                 <span className="whitespace-nowrap">Module:</span>
                 <select
@@ -272,6 +267,7 @@ const ProceduresPageDisplay = () => {
                 </select>
               </div>
 
+              {/* if role is admin // manager - show approve status filter */}
               {(role === "APPROVER" ||
                 role === "ADMIN" ||
                 role === "SPK_MANAGER") && (
@@ -328,6 +324,7 @@ const ProceduresPageDisplay = () => {
               </label>
             </div>
 
+            {/* add procedure button */}
             {(role === "ADMIN" || role === "SPK_MANAGER") && (
               <div>
                 <button
@@ -346,6 +343,7 @@ const ProceduresPageDisplay = () => {
             )}
           </div>
 
+          {/* for academic and non-academic staff that has assigned procedure */}
           {assignedProcedures && assignedProcedures.length > 0 && (
             <>
               <div role="tablist" className="tabs tabs-border mt-5">

@@ -2,10 +2,11 @@
 
 import React, { Suspense } from "react";
 import ResetPasswordForm from "./resetpasswordform";
+import LoadingSpinner from "@/app/components/(common)/loadingspinner";
 
 const ResetPasswordPage = () => {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<LoadingSpinner></LoadingSpinner>}>
       <ResetPasswordForm />
     </Suspense>
   );

@@ -17,12 +17,13 @@ const CreateProcedureModal = () => {
   const [selectedProcedureMode, setSelectedProcedureMode] = useState<
     "create" | "upload" | null
   >(null);
-  //   const [selectedUsers, setSelectedUsers] = useState<SelectOption[]>([]);
 
   const {
     register,
+    unregister,
     handleSubmit,
     setValue,
+    reset,
     formState: { errors },
   } = useForm<ProcedureFormData>();
 
@@ -36,24 +37,8 @@ const CreateProcedureModal = () => {
     handleSelectUser,
   } = useProcedureFormFields(setValue);
 
-  //   const handleSelectUser = (newValue: unknown) => {
-  //     const selectedOptions = newValue as SelectOption[];
-  //     setSelectedUsers(selectedOptions || []);
-
-  //     if (selectedOptions.length > 0) {
-  //       const userIds = selectedOptions.map((user) => user.value);
-  //       setValue("pindaanDokumen.assignedTo", userIds);
-  //       // setFormData({
-  //       //   ...formData,
-  //       //   pindaanDokumen: {
-  //       //     ...formData.pindaanDokumen,
-  //       //     assignedTo: userIds,
-  //       //   },
-  //       // });
-  //     }
-  //   };
-
   const handleProcedureSubmit = async (data: ProcedureFormData) => {
+    console.log("Data: ", data);
     const token = localStorage.getItem("jwt") || "";
     if (!token) {
       triggerGlobalToast("Please login to create new procedure.");
@@ -76,12 +61,10 @@ const CreateProcedureModal = () => {
 
     try {
       const formData = new FormData();
-      if (data.procedureFile) {
+      if (data.procedureFile && selectedProcedureMode === "upload") {
         const fileList = data.procedureFile as any;
         const file = fileList[0] as File;
         formData.append("file", file);
-
-        // formData.append("file", data.procedureFile);
       } else {
         const pindaanDokumenData = JSON.stringify({
           versi: data.pindaanDokumen.versi,
@@ -149,9 +132,17 @@ const CreateProcedureModal = () => {
           document.getElementById("create_procedure_modal") as HTMLDialogElement
         )?.close();
 
-        router.push(
-          `/procedure/proceduremanagementform/edit/${response.data.procedureId}/1`
-        );
+        if (selectedProcedureMode === "upload") {
+          // If upload mode, redirect to the procedure management page
+          router.push(
+            `/procedure/proceduremanagementform/edit/${response.data.procedureId}`
+          );
+          return;
+        } else if (selectedProcedureMode === "create") {
+          router.push(
+            `/procedure/proceduremanagementform/edit/${response.data.procedureId}/1`
+          );
+        }
       } else {
         triggerGlobalToast(response.message || response.error, "error");
       }
@@ -201,10 +192,12 @@ const CreateProcedureModal = () => {
                         if (selectedProcedureMode === "create") {
                           // handleSelectProcedureMode(null);
                           setSelectedProcedureMode(null);
+                          unregister("pindaanDokumen");
                         } else {
                           // handleSelectProcedureMode("create");
                           setSelectedProcedureMode("create");
                         }
+                        unregister("procedureFile");
                       }}
                     >
                       {selectedProcedureMode === "create" ? (
@@ -226,10 +219,12 @@ const CreateProcedureModal = () => {
                         if (selectedProcedureMode === "upload") {
                           // handleSelectProcedureMode(null);
                           setSelectedProcedureMode(null);
+                          unregister("procedureFile");
                         } else {
                           // handleSelectProcedureMode("upload");
                           setSelectedProcedureMode("upload");
                         }
+                        unregister("pindaanDokumen");
                       }}
                     >
                       {selectedProcedureMode === "upload" ? (
@@ -275,6 +270,17 @@ const CreateProcedureModal = () => {
                           {...register("pindaanDokumen.assignedTo", {
                             required: "Must assign at least one user.",
                           })}
+                          // {...register("pindaanDokumen.assignedTo", {
+                          //   validate: (value) => {
+                          //     if (
+                          //       selectedProcedureMode === "create" &&
+                          //       (!value || value.length === 0)
+                          //     ) {
+                          //       return "Must assign at least one user.";
+                          //     }
+                          //     return true; // valid
+                          //   },
+                          // })}
                           onChange={handleSelectUser}
                           isFullWidth
                         />
@@ -299,10 +305,6 @@ const CreateProcedureModal = () => {
                           type="file"
                           accept=".pdf, .doc, .docx"
                           className="file-input mx-2 file:bg-[#e5e5e5]"
-                          // onChange={(e) => {
-                          //   const file = e.target.files?.[0];
-                          //   setValue("procedureFile", file); // <- set a File directly
-                          // }}
                           {...register("procedureFile", {
                             required: "File is required.",
                           })}
@@ -335,6 +337,11 @@ const CreateProcedureModal = () => {
                         "create_procedure_modal"
                       ) as HTMLDialogElement
                     )?.close();
+                    reset();
+                    handleModuleChange(null, []);
+                    handleCategoryChange(null);
+                    setSelectedProcedureMode(null);
+                    handleSelectUser([]);
                   }}
                 >
                   Cancel

@@ -1,7 +1,6 @@
 "use client";
 
 import LoadingSpinner from "@/app/components/(common)/loadingspinner";
-// import ProcedurePDFViewer from "@/app/components/(pdf)/pdfviewer";
 import { FlowChartsEvidenceFileData } from "@/app/interface/EvidenceFile";
 import { Procedure, ProcedureVersion } from "@/app/interface/Procedure";
 import { PindaanDokumenSimplified } from "@/app/interface/ProcedureTemplateFormData";
@@ -13,7 +12,6 @@ import {
   FileX,
   SquarePen,
   Trash2,
-  User2Icon,
 } from "lucide-react";
 import Link from "next/link";
 import React, { useEffect, useMemo, useState } from "react";
@@ -49,8 +47,6 @@ const DisplayProcedurePage = ({
   refetchProcedure,
 }: DisplayProcedurePageProps) => {
   const router = useRouter();
-  // const role = localStorage.getItem("userRole") || "STUDENT";
-  // const userId = localStorage.getItem("userId") || "";
 
   const [isLoading, setIsLoading] = useState(true);
   const [role, setRole] = useState<string>("");
@@ -59,6 +55,7 @@ const DisplayProcedurePage = ({
     useState<FlowChartsEvidenceFileData | null>(null);
   const [flowCharts, setFlowCharts] = useState<FlowChart>();
 
+  // for pdf generation
   const simplifiedVersions: PindaanDokumenSimplified[] = useMemo(() => {
     const maxVerToDisplay = displayProcedureVersion?.pindaanDokumen?.versi || 0;
 
@@ -92,7 +89,7 @@ const DisplayProcedurePage = ({
   useEffect(() => {
     setTimeout(() => {
       setIsLoading(false);
-    }, 1000); // Simulate loading delay
+    }, 1000); // Simulate loading delay - to wait for PDF to load
   }, [displayProcedureVersion]);
 
   useEffect(() => {
@@ -323,51 +320,6 @@ const DisplayProcedurePage = ({
                         </>
                       )}
                   </div>
-
-                  {/* <div className="tabs tabs-bordered justify-center mb-6">
-                      <input
-                        type="radio"
-                        name="procedure_tabs"
-                        role="tab"
-                        className="tab text-lg font-semibold"
-                        aria-label="📄 Procedure"
-                        checked={selectedTab === "procedure"}
-                        onChange={() => setSelectedTab("procedure")}
-                      />
-                      <div
-                        role="tabpanel"
-                        className="tab-content bg-base-100 border-base-300 rounded-box w-full min-h-[100vh]"
-                      >
-                        {selectedTab === "procedure" && (
-                          <ProcedurePDFViewer
-                            templateData={procedure.procedureTemplateData}
-                            onPDFReady={() => {
-                              setIsLoading(false);
-                            }}
-                          />
-                        )}
-                      </div>
-
-                      <input
-                        type="radio"
-                        name="procedure_tabs"
-                        role="tab"
-                        className="tab text-lg font-semibold"
-                        aria-label="📁 Evidence Files"
-                        checked={selectedTab === "evidence"}
-                        onChange={() => setSelectedTab("evidence")}
-                      />
-                      <div
-                        role="tabpanel"
-                        className="tab-content bg-base-100 border-base-300 rounded-box p-6"
-                      >
-                        {selectedTab === "evidence" && (
-                          <div className="w-full min-h-[100vh]">
-                            <span>HI</span>
-                          </div>
-                        )}
-                      </div>
-                    </div> */}
                 </div>
               </>
             ) : displayProcedureVersion?.fileDownloadUrl ? (
@@ -466,7 +418,12 @@ const DisplayProcedurePage = ({
                 >
                   <Link
                     className="w-full h-full flex justify-center items-center gap-2"
-                    href={`/procedure/proceduremanagementform/edit/${displayProcedureVersion.procedureId}/${displayProcedureVersion.pindaanDokumen?.versi}`}
+                    href={
+                      displayProcedureVersion.pindaanDokumen &&
+                      !displayProcedureVersion.fileDownloadUrl
+                        ? `/procedure/proceduremanagementform/edit/${displayProcedureVersion.procedureId}/${displayProcedureVersion.pindaanDokumen?.versi}`
+                        : `/procedure/proceduremanagementform/edit/${displayProcedureVersion.procedureId}`
+                    }
                   >
                     <SquarePen className="h-5 w-5" />
                     Edit
